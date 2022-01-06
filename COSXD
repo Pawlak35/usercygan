@@ -1,0 +1,3652 @@
+local holding_alpha = false
+local enable_picker = false
+local holding_circle = false
+local holding_color = false
+local pos_x_xd = 255
+local pos_y_xd = 0
+local pos_cx_xd = 0
+local pos_cy_xd = 0
+local fincl1 = 0
+local fincl2 = 0
+local xx = 750
+local yy = 500
+local fincl3 = 0
+menux = 100
+menuy = 100
+tab = 3
+show = true
+Nigger = false
+Sw_speed = 0
+dadboi = 0
+
+local akcentlel = color.new(67, 67, 217, 255)
+local ffi = require("ffi")
+ 
+ffi.cdef[[
+    typedef struct tagPOINT {
+        long x;
+        long y;
+    } POINT;
+
+    bool GetCursorPos(
+        POINT* lpPoint
+    );
+]]
+
+pointer = ffi.new("POINT[1]")
+ffi.cdef[[
+    void* CreateFileA(
+        const char*                lpFileName,
+        unsigned long                 dwDesiredAccess,
+        unsigned long                 dwShareMode,
+        unsigned long lpSecurityAttributes,
+        unsigned long                 dwCreationDisposition,
+        unsigned long                 dwFlagsAndAttributes,
+        void*                hTemplateFile
+    );
+    short GetKeyState(
+        int nVirtKey
+    );
+    bool ReadFile(
+        void*       hFile,
+        char*       lpBuffer,
+        unsigned long        nNumberOfBytesToRead,
+        unsigned long*      lpNumberOfBytesRead,
+        int lpOverlapped
+    );
+    bool WriteFile(
+        void*       hFile,
+        char*      lpBuffer,
+        unsigned long        nNumberOfBytesToWrite,
+        unsigned long*      lpNumberOfBytesWritten,
+        int lpOverlapped
+    );
+    unsigned long GetFileSize(
+        void*  hFile,
+        unsigned long* lpFileSizeHigh
+    );
+    void* CloseHandle(void *hFile);
+    int MessageBoxA(void *w, const char *txt, const char *cap, int type);
+    bool CreateDirectoryA(const char* lpPathName, void* lpSecurityAttributes);
+    int exit(int arg);
+
+    void* __stdcall URLDownloadToFileA(void* LPUNKNOWN, const char* LPCSTR, const char* LPCSTR2, int a, int LPBINDSTATUSCALLBACK);        
+    void* __stdcall ShellExecuteA(void* hwnd, const char* op, const char* file, const char* params, const char* dir, int show_cmd);
+
+    int AddFontResourceA(const char* unnamedParam1);
+
+    bool DeleteUrlCacheEntryA(const char* lpszUrlName);
+	typedef int BOOL;
+	typedef long LONG;
+	typedef struct{
+		LONG x, y;
+	}POINT, *LPPOINT;
+    BOOL GetCursorPos(LPPOINT);
+    short GetAsyncKeyState(int);
+    void* GetProcAddress(void* hModule, const char* lpProcName);
+    void* GetModuleHandleA(const char* lpModuleName);
+    
+    typedef struct {
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+        uint8_t a;
+    } color_struct_t;
+
+    typedef void (*console_color_print)(const color_struct_t&, const char*, ...);
+
+    typedef struct
+    {
+        unsigned char r, g, b;
+        signed char exponent;
+    } ColorRGBExp32;
+
+    typedef struct
+    {
+        float x;
+        float y;
+        float z;
+    } vec3_t;
+
+    typedef struct
+    {
+        int		flags;
+        vec3_t	origin;
+        float	radius;
+        ColorRGBExp32	color;
+        float	die;
+        float	decay;
+        float	minlight;
+        int		key;
+        int		style;
+        vec3_t	m_Direction;
+        float	m_InnerAngle;
+        float	m_OuterAngle;
+    } dlight_t, *dlight_ptr_t;
+
+    typedef dlight_ptr_t(__thiscall* alloc_dlight_t)(void*, int);
+    typedef dlight_ptr_t(__thiscall* alloc_elight_t)(void*, int);
+    typedef dlight_ptr_t(__thiscall* get_elight_by_key_t)(void*, int);
+    typedef uintptr_t (__thiscall* GetClientEntity_4242425_t)(void*, int);
+    typedef int(__fastcall* clantag_t)(const char*, const char*);
+    struct c_animstate { 
+        char pad[ 3 ];
+        char m_bForceWeaponUpdate; //0x4
+        char pad1[ 91 ];
+        void* m_pBaseEntity; //0x60
+        void* m_pActiveWeapon; //0x64
+        void* m_pLastActiveWeapon; //0x68
+        float m_flLastClientSideAnimationUpdateTime; //0x6C
+        int m_iLastClientSideAnimationUpdateFramecount; //0x70
+        float m_flAnimUpdateDelta; //0x74
+        float m_flEyeYaw; //0x78
+        float m_flPitch; //0x7C
+        float m_flGoalFeetYaw; //0x80
+        float m_flCurrentFeetYaw; //0x84
+        float m_flCurrentTorsoYaw; //0x88
+        float m_flUnknownVelocityLean; //0x8C
+        float m_flLeanAmount; //0x90
+        char pad2[ 4 ];
+        float m_flFeetCycle; //0x98
+        float m_flFeetYawRate; //0x9C
+        char pad3[ 4 ];
+        float m_fDuckAmount; //0xA4
+        float m_fLandingDuckAdditiveSomething; //0xA8
+        char pad4[ 4 ];
+        float m_vOriginX; //0xB0
+        float m_vOriginY; //0xB4
+        float m_vOriginZ; //0xB8
+        float m_vLastOriginX; //0xBC
+        float m_vLastOriginY; //0xC0
+        float m_vLastOriginZ; //0xC4
+        float m_vVelocityX; //0xC8
+        float m_vVelocityY; //0xCC
+        char pad5[ 4 ];
+        float m_flUnknownFloat1; //0xD4
+        char pad6[ 8 ];
+        float m_flUnknownFloat2; //0xE0
+        float m_flUnknownFloat3; //0xE4
+        float m_flUnknown; //0xE8
+        float m_flSpeed2D; //0xEC
+        float m_flUpVelocity; //0xF0
+        float m_flSpeedNormalized; //0xF4
+        float m_flFeetSpeedForwardsOrSideWays; //0xF8
+        float m_flFeetSpeedUnknownForwardOrSideways; //0xFC
+        float m_flTimeSinceStartedMoving; //0x100
+        float m_flTimeSinceStoppedMoving; //0x104
+        bool m_bOnGround; //0x108
+        bool m_bInHitGroundAnimation; //0x109
+        float m_flTimeSinceInAir; //0x10A
+        float m_flLastOriginZ; //0x10E
+        float m_flHeadHeightOrOffsetFromHittingGroundAnimation; //0x112
+        float m_flStopToFullRunningFraction; //0x116
+        char pad7[ 4 ]; //0x11A
+        float m_flMagicFraction; //0x11E
+        char pad8[ 60 ]; //0x122
+        float m_flWorldForce; //0x15E
+        char pad9[ 462 ]; //0x162
+        float m_flMaxYaw; //0x334
+    };
+    struct animation_layer_t {
+        char pad20[24];
+        uint32_t m_nSequence;
+        float m_flPrevCycle;
+        float m_flWeight;
+        char pad20[8];
+        float m_flCycle;
+        void *m_pOwner;
+        char pad_0038[ 4 ];
+    };
+]]
+
+local ffi_helpers = {
+    color_print_fn = ffi.cast("console_color_print", ffi.C.GetProcAddress(ffi.C.GetModuleHandleA("tier0.dll"), "?ConColorMsg@@YAXABVColor@@PBDZZ")),
+    color_print = function(self, text, color)
+        local col = ffi.new("color_struct_t")
+
+        col.r = color:r()
+        col.g = color:g()
+        col.b = color:b()
+        col.a = color:a()
+
+        self.color_print_fn(col, text)
+    end
+}
+
+pointer = ffi.new("POINT[1]")
+
+local function coloredPrint(color, text)
+	ffi_helpers.color_print(ffi_helpers, text, color)
+end
+
+local ffi = require  ("ffi")
+
+ffi.cdef[[
+    typedef uintptr_t (__thiscall* GetClientEntity_4242425_t)(void*, int);
+
+    typedef struct
+    {
+        float x;
+        float y;
+        float z;
+    } Vector_t;
+
+    typedef struct
+    {
+        char        pad0[0x60]; // 0x00
+        void*       pEntity; // 0x60
+        void*       pActiveWeapon; // 0x64
+        void*       pLastActiveWeapon; // 0x68
+        float        flLastUpdateTime; // 0x6C
+        int            iLastUpdateFrame; // 0x70
+        float        flLastUpdateIncrement; // 0x74
+        float        flEyeYaw; // 0x78
+        float        flEyePitch; // 0x7C
+        float        flGoalFeetYaw; // 0x80
+        float        flLastFeetYaw; // 0x84
+        float        flMoveYaw; // 0x88
+        float        flLastMoveYaw; // 0x8C // changes when moving/jumping/hitting ground
+        float        flLeanAmount; // 0x90
+        char        pad1[0x4]; // 0x94
+        float        flFeetCycle; // 0x98 0 to 1
+        float        flMoveWeight; // 0x9C 0 to 1
+        float        flMoveWeightSmoothed; // 0xA0
+        float        flDuckAmount; // 0xA4
+        float        flHitGroundCycle; // 0xA8
+        float        flRecrouchWeight; // 0xAC
+        Vector_t    vecOrigin; // 0xB0
+        Vector_t    vecLastOrigin;// 0xBC
+        Vector_t    vecVelocity; // 0xC8
+        Vector_t    vecVelocityNormalized; // 0xD4
+        Vector_t    vecVelocityNormalizedNonZero; // 0xE0
+        float        flVelocityLenght2D; // 0xEC
+        float        flJumpFallVelocity; // 0xF0
+        float        flSpeedNormalized; // 0xF4 // clamped velocity from 0 to 1
+        float        flRunningSpeed; // 0xF8
+        float        flDuckingSpeed; // 0xFC
+        float        flDurationMoving; // 0x100
+        float        flDurationStill; // 0x104
+        bool        bOnGround; // 0x108
+        bool        bHitGroundAnimation; // 0x109
+        char        pad2[0x2]; // 0x10A
+        float        flNextLowerBodyYawUpdateTime; // 0x10C
+        float        flDurationInAir; // 0x110
+        float        flLeftGroundHeight; // 0x114
+        float        flHitGroundWeight; // 0x118 // from 0 to 1, is 1 when standing
+        float        flWalkToRunTransition; // 0x11C // from 0 to 1, doesnt change when walking or crouching, only running
+        char        pad3[0x4]; // 0x120
+        float        flAffectedFraction; // 0x124 // affected while jumping and running, or when just jumping, 0 to 1
+        char        pad4[0x208]; // 0x128
+        float        flMinBodyYaw; // 0x330
+        float        flMaxBodyYaw; // 0x334
+        float        flMinPitch; //0x338
+        float        m_flPoseParameter; // 0x342
+        float        m_flCurrentFeetYaw; // 0x346
+        float        feet_speed_forwards_or_sideways; // 0x350
+        float        some_pose; // 0x354
+        float        feet_cycle; // 0x358
+        float        flMaxPitch; // 0x33C
+        int            iAnimsetVersion; // 0x340
+    } CCSGOPlayerAnimationState_534535_t;
+]]
+
+local entity_list_ptr = ffi.cast("void***", utils.create_interface("client.dll", "VClientEntityList003"))
+local get_client_entity_fn = ffi.cast("GetClientEntity_4242425_t", entity_list_ptr[0][3])
+
+local ffi_helpers = {
+    get_entity_address = function(ent_index)
+        local addr = get_client_entity_fn(entity_list_ptr, ent_index)
+        return addr
+    end
+}
+
+
+local offset_value = 0x9960
+local shared_onground
+local logs = {}
+
+local loggss = {}
+
+local function getMousePos()
+    local ppoint = ffi.new("POINT[1]")
+    if ffi.C.GetCursorPos(ppoint) == 0 then
+        error("Couldn't get cursor position!", 2)
+    end
+
+    return vector.new(ppoint[0].x, ppoint[0].y, 0)
+end
+
+local function asyncKeyState(key)
+    return ffi.C.GetAsyncKeyState(key) ~= 0
+end
+
+local urlmon = ffi.load "UrlMon"
+local wininet = ffi.load "WinInet"
+local gdi = ffi.load "Gdi32"
+
+function download(from, to)
+    wininet.DeleteUrlCacheEntryA(from)
+    urlmon.URLDownloadToFileA(nil, from, to, 0,0)
+end;
+
+local appdataraw = os.getenv("appdata")
+local appdata = string.gsub(appdataraw, "\\", "/")
+local path = appdata.."/Legendware/color.txt"
+local command = 'if not exist "'..path..'" (echo 1770s500 > "'..path..'")'
+os.execute(command)
+
+
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+ffi.C.CreateDirectoryA("C:\\Legendside", NULL)
+ffi.C.CreateDirectoryA("C:\\fonts", NULL)
+ffi.C.CreateDirectoryA("Legendside", NULL)
+download("https://github.com/lineout1337/fonts/blob/main/undefeated.ttf?raw=true", "C:\\fonts\\undefeated.ttf")
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+gdi.AddFontResourceA( "C:\\Legendside\\fonts\\undefeated.ttf")
+ffi.C.CreateFileA("Legendside\\slot1.txt", 0xC0000000, 0x3, 0, 0x4, 0x80, nil)
+ffi.C.CreateFileA("Legendside\\color.txt", 0xC0000000, 0x3, 0, 0x4, 0x80, nil)
+local menuOpen = true
+local loaded = false
+local holdingMenuKey = false
+local menuPos = vector.new(0, 0, 0)
+local menuDiff = vector.new(0, 0, 0)
+local dragingMenu = false
+local holdingWidget = 0
+local holdingTab = 0
+local activeCombo = 0
+local activeMultiCombo = 0
+local holdingMulti = false
+local holdingSave = false
+local holdingLoad = false
+local savingCfg = false
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+boolVars = {}
+intVars = {}
+loadstring(http.get("https://pastebin.com","/raw/n452RV3x"))() 
+boolVars[1] = false
+boolVars[2] = false
+boolVars[3] = false
+boolVars[4] = false
+boolVars[5] = false
+boolVars[6] = true--watermark
+boolVars[7] = false
+boolVars[8] = false
+boolVars[9] = false
+boolVars[10] = false
+boolVars[11] = {}
+boolVars[11][1] = {}
+boolVars[11][2] = {}
+boolVars[11][3] = {}
+boolVars[11][4] = {}
+boolVars[11][5] = {}
+boolVars[11][1][1] = false
+boolVars[11][1][2] = false
+boolVars[11][1][3] = false
+boolVars[11][1][4] = false
+boolVars[11][2][1] = false
+boolVars[11][2][2] = false
+boolVars[11][2][3] = false
+boolVars[11][2][4] = false
+boolVars[11][3][1] = false
+boolVars[11][3][2] = false
+boolVars[11][3][3] = false
+boolVars[11][3][4] = false
+boolVars[11][4][1] = false
+boolVars[11][4][2] = false
+boolVars[11][4][3] = false
+boolVars[11][4][4] = false
+boolVars[11][5][1] = false
+boolVars[11][5][2] = false
+boolVars[11][5][3] = false
+boolVars[11][5][4] = false
+boolVars[12] = false
+boolVars[13] = false
+boolVars[14] = false--jump scout
+boolVars[15] = false--lowdelta
+boolVars[16] = false--overiedpresets
+boolVars[17] = false--hitlogi
+boolVars[18] = false--server tick
+boolVars[19] = false--clock drift
+boolVars[20] = false--extended backtrack
+boolVars[21] = false--extreme backtrack
+boolVars[22] = false--keybindys
+boolVars[23] = false--damage indicator
+boolVars[24] = false--extreme backtrack
+boolVars[25] = false--nicxd
+boolVars[26] = false--holo panel
+boolVars[27] = false---Fix zoom sensitivity
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+boolVars[28] = {}---at target
+boolVars[28][1] = false
+boolVars[28][2] = false
+boolVars[28][3] = false
+boolVars[28][4] = false
+boolVars[28][5] = false
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+boolVars[31] = false--anims
+boolVars[37] = false--external brute
+boolVars[38] = false--anims
+boolVars[46] = false--knife
+boolVars[47] = false--scout
+boolVars[48] = false--inscope
+loadstring(http.get("https://pastebin.com","/raw/M97HgbS0"))()
+intVars[1] = 60
+intVars[2] = 50
+intVars[3] = {}
+
+intVars[3][1] = {}
+intVars[3][1][1] = {}
+intVars[3][1][2] = {}
+loadstring(http.get("https://pastebin.com","/raw/n452RV3x"))() 
+intVars[3][2] = {}
+intVars[3][2][1] = {}
+intVars[3][2][2] = {}
+loadstring(http.get("https://pastebin.com","/raw/n452RV3x"))() 
+intVars[3][3] = {}
+intVars[3][4] = {}--air
+intVars[3][5] = {}--kucanie
+
+loadstring(http.get("https://pastebin.com","/raw/n452RV3x"))() 
+intVars[3][1][1] = 1 --desync type stanie  albo  fake modifire
+intVars[3][2][1] = 1 --desync type stanie  albo  fake modifire
+intVars[3][3][1] = 1 --desync type stanie  albo  fake modifire
+intVars[3][4][1] = 1 --desync type air  albo  fake modifire
+intVars[3][5][1] = 1 --desync type kucanie  albo  fake modifire
+
+intVars[3][1][2] = 1 -- ideal i match faker albo real modifire
+intVars[3][2][2] = 1 -- ideal i match faker albo real modifire
+intVars[3][3][2] = 1 -- ideal i match faker albo real modifire
+intVars[3][4][2] = 1
+intVars[3][5][2] = 1 --desync type kucanie  albo  fake modifire
+
+intVars[4] = {}
+intVars[4][1] = 1
+intVars[4][2] = 7
+intVars[4][3] = 16
+intVars[5] = 1
+intVars[6] = {}
+intVars[6][1] = 0
+intVars[6][2] = 0
+intVars[6][3] = 0
+intVars[7] = 1--indicatory
+intVars[8] = {}
+intVars[8][1] = 1
+intVars[8][2] = 1
+intVars[8][3] = 1
+intVars[8][4] = 1
+intVars[8][5] = 1
+intVars[8][6] = 1
+intVars[8][7] = 1
+intVars[8][8] = 1
+intVars[8][9] = 1
+intVars[9] = 1
+intVars[10] = 100
+intVars[11] = {}
+intVars[11][1] = {}
+intVars[11][2] = {}
+intVars[11][3] = {}
+intVars[11][4] = {}
+intVars[11][5] = {}
+intVars[11][1][1] = 1
+intVars[11][1][2] = 50
+intVars[11][2][1] = 1
+intVars[11][2][2] = 50
+intVars[11][3][1] = 1
+intVars[11][3][2] = 50
+intVars[11][4][1] = 1
+intVars[11][4][2] = 50
+intVars[11][5][1] = 1
+intVars[11][5][2] = 50
+intVars[12] = 1
+intVars[13] = 1--keybinds list
+intVars[14] = 2--watermark
+intVars[15] = 1--presets
+intVars[16] = 1--spector list
+
+weaponSelect = 1
+movementSelect = 1
+prevLayer6 = {}
+
+
+local keybind_used = "NONE"
+local keybind_code = 0x1
+local glow = false
+local glowe = false
+local toggled_key = false
+local toggle = false
+local is_active = false
+
+local misses = {}
+local resolveValue = {}
+for i = 0,64 do
+    misses[i] = 0
+    resolveValue[i] = 30
+end
+
+local sway_range = 0
+local sway_direction = true
+local pitch_ticks = 0
+local pitch_backup = -1
+local yaw_backup = 190
+local yaw_base_backup = -1
+local in_use = false
+local in_use_ticks = 0
+local fluctuate_ticks = 0
+local ideal_tick_limit = 5
+local should_off = false
+local should_change = {
+    [1] = true,
+    [2] = true,
+    [3] = true,
+}
+local brute_range = {
+    [1] = 0,
+    [2] = 0,
+    [3] = 0,
+}
+
+
+local font = render.create_font("Tahoma", 13, 100, true, false, false)
+local fontpanel = render.create_font("Tahoma", 17, 16, false, false, false)
+local indifont = render.create_font("Calibri", 26, 100, true, true, false)
+local smallfont = render.create_font("Tahoma", 12, 100, false, false, true)
+local panelfont = render.create_font("Tahoma", 21, 100, false, false, true)
+
+local indifont2 = render.create_font("Calibri", 15, 50, true, true, false)
+
+local entity_list_ptr = ffi.cast("void***", utils.create_interface("client.dll", "VClientEntityList003"))
+local get_client_entity_fn = ffi.cast("GetClientEntity_4242425_t", entity_list_ptr[0][3])
+
+local ffi_helpers = {
+    get_animstate_offset = function()
+        return 14612
+    end,
+
+    get_entity_address = function(ent_index)
+        local addr = get_client_entity_fn(entity_list_ptr, ent_index)
+        return addr
+    end
+}
+
+
+function toint(n)
+    local s = tostring(n)
+    local i, j = s:find('%.')
+    if i then
+        return tonumber(s:sub(1, i-1))
+    else
+        return n
+    end
+end
+
+local function calculateAngle(src, point)
+    local angles = vector.new(0, 0, 0)
+
+    local delta = vector.new(src.x - point.x, src.y - point.y, src.z - point.z)
+    local hyp = delta:length_2d()
+
+    angles.y = math.atan(delta.y / delta.x) * math.pi
+    angles.x = math.atan(-delta.z / hyp) * -math.pi
+    angles.z = 0.0
+    angles.y = angles.y + 180.0
+
+    return angles
+end
+
+function normalize_yaw(y)
+    while y > 180 do
+        y = y - 360
+    end
+    while y < -180 do
+        y = y + 360
+    end
+    return y
+end
+
+function get_eye_position(player, cmd)
+    local origin = player:get_origin()
+    return vector.new(origin.x + cmd.viewangles.x, origin.y + cmd.viewangles.y, origin.z + cmd.viewangles.z)
+end
+
+
+local backup = {
+    did = false,
+    yaw = 0,
+    pitch = 0,
+    target = 0
+}
+
+
+local switcherere = 0
+desynctime = 0
+idealtime = 0
+
+local function anti_aim(cmd)
+    local localplayer = entitylist.get_local_player()
+    local OnGround = bit.band(localplayer: get_prop_int("CBasePlayer","m_hGroundEntity"), 1);
+
+    if OnGround == 1 or bit.band(cmd.buttons, buttons.in_jump) == buttons.in_jump then -- air check
+        air = true
+    else
+        air = false
+    end
+    
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+
+
+
+    if boolVars[1] == true then
+        ffi.cast("float*", ffi_helpers.get_entity_address(localplayer:get_index()) + 10100)[0] = 0
+        menu.set_int("misc.leg_movement", math.random(1, 2))
+    end
+    if legitact == true then
+        in_use = localplayer:get_prop_bool("CCSPlayer", "m_bIsDefusing") or entitylist.get_weapon_by_player(localplayer):get_prop_int("CBaseCombatWeapon", "m_iItemDefinitionIndex") == 49
+        if in_use == false then
+            in_use_ticks = in_use_ticks + 1
+            if in_use_ticks > 4 then
+                cmd.buttons = bit.band(cmd.buttons, bit.bnot(32))
+            end
+        else
+            if in_use_ticks > 0 then
+                in_use_ticks = 0
+            end
+        end
+
+        if pitch_backup == -1 then
+            pitch_backup = menu.get_int("anti_aim.pitch")
+        end
+
+        menu.set_int("anti_aim.pitch", 0)
+        menu.set_int("anti_aim.yaw_offset", 180)
+        menu.set_int("anti_aim.desync_type", 1)
+        menu.set_int("anti_aim.yaw_modifier", 0)
+        menu.set_int("anti_aim.desync_range", intVars[1])
+        menu.set_int("anti_aim.desync_range_inverted", intVars[1])
+        return
+    else
+        if in_use_ticks > 0 then
+            in_use_ticks = 0
+        end
+        if pitch_backup ~= -1 then
+            menu.set_int("anti_aim.pitch", pitch_backup)
+            pitch_backup = -1
+        end
+    end
+    if legitact == true then return end
+    local flags = localplayer:get_prop_int("CBasePlayer", "m_fFlags")
+    if boolVars[2] == true then
+        local on_ground = bit.band(flags, 1) == 1
+        if on_ground then
+            if was_in_air == true then
+                pitch_ticks = pitch_ticks + 1
+                if pitch_ticks > 3 then
+                    if pitch_backup == -1 then
+                        pitch_backup = menu.get_int("anti_aim.pitch")
+                    end
+                    menu.set_int("anti_aim.pitch", 0)
+                    if pitch_ticks > 43 then
+                        pitch_ticks = 0
+                        menu.set_int("anti_aim.pitch", pitch_backup)
+                        pitch_backup = -1
+                        was_in_air = false
+                    end
+                end
+            end
+        else
+            was_in_air = true
+            if pitch_ticks > 0 then
+                pitch_ticks = 0
+            end
+            if pitch_backup ~= -1 then
+                menu.set_int("anti_aim.pitch", pitch_backup)
+                pitch_backup = -1
+            end
+        end
+    end
+    local id = 1
+    local desync_type = 0
+    local idealyawxDDDitodrugiegufno = 0
+    local tankAAxDDD = 0
+    local real_in_air = 0
+    local fake_in_air = 0
+    local speed = localplayer:get_velocity():length_2d()
+
+    if ffi.C.GetAsyncKeyState(0x11) ~= 0 then
+         return end
+
+    if air == true then
+        real_in_air = intVars[3][4][1]
+        fake_in_air = intVars[3][4][2]
+    end
+
+    if speed < 2 and air == false then
+        desync_type = intVars[3][1][1]
+        idealyawxDDDitodrugiegufno = intVars[3][1][2]
+        tankAAxDDD = intVars[15]
+        id = 1
+    elseif menu.get_key_bind_state("misc.slow_walk_key") and air == false then
+        desync_type = intVars[3][2][1]
+        idealyawxDDDitodrugiegufno = intVars[3][2][2]
+        tankAAxDDD = intVars[15] 
+        id = 2
+    elseif air == false then
+        desync_type = intVars[3][3][1]
+        idealyawxDDDitodrugiegufno = intVars[3][3][2]
+        tankAAxDDD = intVars[15] 
+        id = 3
+    end
+    if legitact == true then return end
+    if switcherere == 0 then
+        switcherere = 1
+        idealtime = idealtime + 1
+
+        desynctime = desynctime + 1 
+    end
+    if switcherere == 1 then
+        switcherere = 0 
+    end
+
+    if boolVars[15] == true and menu.get_key_bind_state("misc.slow_walk_key") then
+        menu.set_int("anti_aim.yaw_offset", -1)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.desync_type", 1)
+        menu.set_int("anti_aim.desync_range", 50)
+        menu.set_int("anti_aim.desync_range_inverted", 55)
+        menu.set_int("anti_aim.yaw_modifier_range", 3)
+    end
+    if boolVars[15] == true and menu.get_key_bind_state("misc.slow_walk_key") then return end
+
+    if tankAAxDDD == 2 and boolVars[16] == true then
+        menu.set_int("anti_aim.yaw_offset", 0)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.desync_type", 2)
+        menu.set_int("anti_aim.desync_range", 25)
+        menu.set_int("anti_aim.desync_range_inverted", 25)
+        menu.set_int("anti_aim.yaw_modifier_range", math.random(66,75))       
+    end
+
+    if tankAAxDDD == 3 and boolVars[16] == true then
+        if idealtime >= 1 and idealtime <= 50 then
+            menu.set_int("anti_aim.yaw_offset", -15)
+            menu.set_int("anti_aim.yaw_modifier", 1)
+            menu.set_int("anti_aim.yaw_modifier_range", 45)
+            menu.set_int("anti_aim.desync_type", 1)
+            menu.set_int("anti_aim.desync_range", 60)
+            menu.set_int("anti_aim.desync_range_inverted", 60) 
+        elseif idealtime >= 50 and idealtime <= 100 then
+            menu.set_int("anti_aim.yaw_offset", 9)
+            menu.set_int("anti_aim.yaw_modifier", 1)
+            menu.set_int("anti_aim.yaw_modifier_range", 45)
+            menu.set_int("anti_aim.desync_type", 1)
+            menu.set_int("anti_aim.desync_range", 40)
+            menu.set_int("anti_aim.desync_range_inverted", 40) 
+        elseif idealtime >= 100 and idealtime <= 150 then
+            menu.set_int("anti_aim.yaw_offset", -11)
+            menu.set_int("anti_aim.yaw_modifier", 1)
+            menu.set_int("anti_aim.yaw_modifier_range", 45)
+            menu.set_int("anti_aim.desync_type", 1)
+            menu.set_int("anti_aim.desync_range", 50)
+            menu.set_int("anti_aim.desync_range_inverted", 50) 
+        elseif idealtime >= 150 and idealtime <= 200 then
+            menu.set_int("anti_aim.yaw_offset", 4)
+            menu.set_int("anti_aim.yaw_modifier", 1)
+            menu.set_int("anti_aim.yaw_modifier_range", 45)
+            menu.set_int("anti_aim.desync_type", 1)
+            menu.set_int("anti_aim.desync_range", 25)
+            menu.set_int("anti_aim.desync_range_inverted", 25) 
+        end     
+    end
+
+    if desync_type == 2 or real_in_air == 2 then
+        if desynctime >= 1 and desynctime < 20 then
+            menu.set_int("anti_aim.desync_range", 0)
+            menu.set_int("anti_aim.desync_range_inverted", 0) 
+        elseif desynctime >= 20 then       
+            menu.set_int("anti_aim.desync_range", 60)
+            menu.set_int("anti_aim.desync_range_inverted", 60) 
+        end
+        if desynctime >= 30 then       
+            desynctime = 0
+        end
+    end
+    if desync_type == 3 or real_in_air == 3 then
+        if menu.get_int("anti_aim.desync_type") == 1 then
+            menu.set_int("anti_aim.desync_type", 2)
+        elseif menu.get_int("anti_aim.desync_type") == 2 then
+            menu.set_int("anti_aim.desync_type", 1)
+        end
+    end
+    if desync_type == 4 or real_in_air == 4 then
+        menu.set_int("anti_aim.desync_type", 1)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.yaw_modifier_range", 8)
+        if should_change[id] == true then
+            brute_range[id] = math.random(33, 54)
+            should_change[id] = false
+        end
+        menu.set_int("anti_aim.desync_range", brute_range[id])
+        menu.set_int("anti_aim.desync_range_inverted", brute_range[id])
+        menu.set_int("anti_aim.yaw_offset", -1)
+    end
+    if desync_type == 5 or real_in_air == 5 then
+        menu.set_int("anti_aim.yaw_offset", -1)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.desync_type", 2)
+        menu.set_int("anti_aim.desync_range", 36)
+        menu.set_int("anti_aim.desync_range_inverted", 36)
+        menu.set_int("anti_aim.yaw_modifier_range", 10)   
+    end
+  
+    if idealyawxDDDitodrugiegufno == 2 or fake_in_air == 2 then
+        if idealtime > 1 and idealtime < 50 then
+            menu.set_int("anti_aim.yaw_offset", -3)
+        elseif idealtime > 50 and idealtime < 100 then
+            menu.set_int("anti_aim.yaw_offset", 9)
+        elseif idealtime > 100 and idealtime < 130 then
+            menu.set_int("anti_aim.yaw_offset", -11)
+        elseif idealtime > 130 and idealtime < 160 then
+            menu.set_int("anti_aim.yaw_offset", 25)
+        elseif idealtime > 160 then
+            menu.set_int("anti_aim.yaw_offset", -21)
+            idealtime = 0
+        end
+    end
+    if idealyawxDDDitodrugiegufno == 3 or fake_in_air == 3 then
+        if idealtime > 1 and idealtime < 30 then
+            menu.set_int("anti_aim.yaw_offset", -1)
+        elseif idealtime > 30 and idealtime < 70 then
+            menu.set_int("anti_aim.yaw_offset", 4)
+        elseif idealtime > 70 and idealtime < 100 then
+            menu.set_int("anti_aim.yaw_offset", 9)
+        elseif idealtime > 100 then
+            menu.set_int("anti_aim.yaw_offset", 14)
+            idealtime = 0
+        end
+    end
+end
+
+local function anti_aim2(cmd)
+local localplayer = entitylist.get_local_player()
+if not localplayer then return end
+
+
+
+local localplayer = entitylist.get_local_player()
+local OnGround = bit.band(localplayer: get_prop_int("CBasePlayer","m_hGroundEntity"), 1);
+
+if OnGround == 1 or bit.band(cmd.buttons, buttons.in_jump) == buttons.in_jump then -- air check
+    air = true
+else
+    air = false
+end
+
+local speed = localplayer:get_velocity():length_2d()
+
+    if speed < 2 and boolVars[28][1] == true or
+       menu.get_key_bind_state("misc.slow_walk_key") and boolVars[28][2] == true or
+       speed > 150  and boolVars[28][3] == true or
+       boolVars[28][4] and air == true or boolVars[28][5] and ffi.C.GetAsyncKeyState(0x11) ~= 0 then
+
+        menu.set_int("anti_aim.target_yaw", 1) 
+    else
+        menu.set_int("anti_aim.target_yaw", 0) 
+    end
+
+    local id = 1
+    local real_crouch = 0
+    local fake_crouch = 0
+
+    if ffi.C.GetAsyncKeyState(0x11) ~= 0 then
+        real_crouch = intVars[3][5][1]
+        fake_crouch = intVars[3][5][2]
+    end
+
+    if real_crouch == 2 then
+        if desynctime >= 1 and desynctime < 20 then
+            menu.set_int("anti_aim.desync_range", 0)
+            menu.set_int("anti_aim.desync_range_inverted", 0) 
+        elseif desynctime >= 20 then       
+            menu.set_int("anti_aim.desync_range", 60)
+            menu.set_int("anti_aim.desync_range_inverted", 60) 
+        end
+        if desynctime >= 30 then       
+            desynctime = 0
+        end
+    end
+    if real_crouch == 3 then
+        if menu.get_int("anti_aim.desync_type") == 1 then
+            menu.set_int("anti_aim.desync_type", 2)
+        elseif menu.get_int("anti_aim.desync_type") == 2 then
+            menu.set_int("anti_aim.desync_type", 1)
+        end
+    end
+    if real_crouch == 4 then
+        menu.set_int("anti_aim.desync_type", 1)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.yaw_modifier_range", 8)
+        if should_change[id] == true then
+            brute_range[id] = math.random(33, 54)
+            should_change[id] = false
+        end
+        menu.set_int("anti_aim.desync_range", brute_range[id])
+        menu.set_int("anti_aim.desync_range_inverted", brute_range[id])
+        menu.set_int("anti_aim.yaw_offset", -1)
+    end
+    if real_crouch == 5 then
+        menu.set_int("anti_aim.yaw_offset", -1)
+        menu.set_int("anti_aim.yaw_modifier", 1)
+        menu.set_int("anti_aim.desync_type", 2)
+        menu.set_int("anti_aim.desync_range", 36)
+        menu.set_int("anti_aim.desync_range_inverted", 36)
+        menu.set_int("anti_aim.yaw_modifier_range", 10)   
+    end
+  
+    if fake_crouch == 2 then
+        if idealtime > 1 and idealtime < 50 then
+            menu.set_int("anti_aim.yaw_offset", -3)
+        elseif idealtime > 50 and idealtime < 100 then
+            menu.set_int("anti_aim.yaw_offset", 9)
+        elseif idealtime > 100 and idealtime < 130 then
+            menu.set_int("anti_aim.yaw_offset", -11)
+        elseif idealtime > 130 and idealtime < 160 then
+            menu.set_int("anti_aim.yaw_offset", 25)
+        elseif idealtime > 160 then
+            menu.set_int("anti_aim.yaw_offset", -21)
+            idealtime = 0
+        end
+    end
+    if fake_crouch == 3 then
+        if idealtime > 1 and idealtime < 30 then
+            menu.set_int("anti_aim.yaw_offset", -1)
+        elseif idealtime > 30 and idealtime < 70 then
+            menu.set_int("anti_aim.yaw_offset", 4)
+        elseif idealtime > 70 and idealtime < 100 then
+            menu.set_int("anti_aim.yaw_offset", 9)
+        elseif idealtime > 100 then
+            menu.set_int("anti_aim.yaw_offset", 14)
+            idealtime = 0
+        end
+    end
+end
+
+local screen = {x = engine.get_screen_width(), y = engine.get_screen_height()}
+local font69 = render.create_font("Verdana", 12, 0, true, false, false)
+
+username = globals.get_username()
+local version = "Stable"
+if username == "MelonHVH" or username == "Cyguss" then
+    version = "Developer"
+end
+
+local wpn2tab = {
+  ['CDEagle'] = 0.0,
+  ['Glock'] = 1.0,
+  ['HKP2000'] = 1.0,
+  ['P250'] = 1.0,
+  ['Elite'] = 1.0,
+  ['Tec9'] = 1.0,
+  ['FiveSeven'] = 1.0,
+  ['SCAR20'] = 2.0,
+  ['G3SG1'] = 2.0,
+  ['SSG08'] = 3.0,
+  ['AWP'] = 4.0,
+  ['CAK47'] = 5.0,
+  ['M4A1'] = 5.0,
+  ['SG556'] = 5.0,
+  ['Aug'] = 5.0,
+  ['GalilAR'] = 5.0,
+  ['Famas'] = 5.0,
+  ['MAC10'] = 6.0,
+  ['UMP45'] = 6.0,
+  ['MP7'] = 6.0,
+  ['MP9'] = 6.0,
+  ['P90'] = 6.0,
+  ['Bizon'] = 6.0,
+  ['NOVA'] = 7.0,
+  ['XM1014'] = 7.0,
+  ['Sawedoff'] = 7.0,
+  ['Mag7'] = 7.0,
+  ['M249'] = 8.0,
+  ['Negev'] = 8.0,
+}
+
+
+
+client.add_callback('on_paint', function()
+  if not boolVars[23] == true then return end
+  
+  local player = entitylist.get_local_player()
+  if not player then return end
+
+  local weapon = entitylist.get_weapon_by_player(player)
+  if not weapon then return end
+
+  weapon = weapon:get_class_name():gsub('CWeapon', '')
+  local current = wpn2tab[weapon] or nil
+
+  if current ~= nil then
+    local damage = menu.get_int(string.format('rage.weapon[%s].%s   ', current, menu.get_key_bind_state('rage.force_damage_key') and 'force_damage_value' or 'minimum_damage'))
+    render.draw_text_centered(smallfont, screen.x /2 + 5.0, screen.y /2 - 15.0, color.new(255, 255, 255), false, false, string.format('%s', damage))
+  end
+end)
+
+local function fake_lag()
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    if boolVars[13] == true and menu.get_key_bind_state("misc.automatic_peek_key") and menu.get_key_bind_state("rage.double_tap_key") then
+        should_off = true
+        if ideal_tick_limit < 5 then
+            ideal_tick_limit = ideal_tick_limit + 1
+        end
+        menu.set_int("anti_aim.fake_lag_limit", ideal_tick_limit)
+        return
+    elseif should_off then
+        should_off = false
+    end
+    if intVars[4][1] == 1 then
+        menu.set_int("anti_aim.fake_lag_limit", math.random(intVars[4][2], intVars[4][3]))
+    elseif intVars[4][1] == 2 then
+        local min = intVars[4][2]
+        local max = intVars[4][3]
+        fluctuate_ticks = fluctuate_ticks + 1
+        if fluctuate_ticks > 10 then
+            local diff = max - min
+            if diff < 0 then
+                diff = -diff
+            end
+            local final_choke = fluctuate_ticks - 10
+            if final_choke >= max then
+                final_choke = max
+                if fluctuate_ticks - 10 > max + 5 then
+                    fluctuate_ticks = 0
+                end
+            end
+            menu.set_int("anti_aim.fake_lag_limit", final_choke)
+        else
+            menu.set_int("anti_aim.fake_lag_limit", min)
+        end
+    elseif intVars[4][1] == 3 then
+        local adaptive_choke = 0
+        local min = intVars[4][2]
+        local max = intVars[4][3]
+        local speed = localplayer:get_velocity():length_2d()
+        local max_speed = console.get_int("sv_maxspeed")
+        adaptive_choke = 16 * (speed / max_speed)
+
+        if adaptive_choke < min then
+            adaptive_choke = min
+        end
+
+        if adaptive_choke > max then
+            adaptive_choke = max
+        end
+
+        adaptive_choke = toint(adaptive_choke)
+
+        menu.set_int("anti_aim.fake_lag_limit", adaptive_choke)
+    end
+end
+
+local players = {}
+local function get_spectating_players()
+    players = {}
+    players.name = ""
+
+    for i = 1, globals.get_maxclients(), 1 do
+        local ent = entitylist.get_player_by_index(i)
+        local toplayer = entitylist.entity_to_player(ent)
+        if not ent or toplayer:get_health() > 0 or toplayer:get_dormant() then goto continue end
+        local spectating = ent:get_prop_int("CBasePlayer", "m_hObserverTarget")
+        if spectating ~= nil then
+            table.insert(players, {name = engine.get_player_info(i).name})
+        end
+        ::continue::
+    end
+end
+local fonts = {
+    spectators_text = render.create_font( "Verdana", 13, 300),
+    spectators_text_heigth = 13,
+    spectators = render.create_font( "Verdana", 12, 300),
+}
+
+local x = 300
+local y = 300
+local w = 150
+local h = 20
+function paintspec()
+    local localplayer = entitylist.get_local_player()
+    
+    local koloreklel = akcentlel
+    local spectaroryxDDD = intVars[16]
+
+    if not localplayer then return end
+    if spectaroryxDDD == 1 then return end
+    
+    local mousePos = getMousePos()
+    if asyncKeyState(0x1) then
+        if mousePos.x >= x-15 and mousePos.x <= x + 150 and mousePos.y >= y-5 and mousePos.y <= y + 18 then
+            y = mousePos.y
+            x = mousePos.x
+        end
+    end
+    local spacing = 12
+    local is_script_menu_open = true 
+    local get_color_from_colorpicker = koloreklel
+    local title_spectators = "spectators"
+    if players ~= nil or is_script_menu_open then
+        render.draw_rect_filled(x,y, w, h, color.new(25,25,25,255))
+        if spectaroryxDDD == 2 then
+            render.draw_rect_filled(x +1,y, w -1, h-17, get_color_from_colorpicker)
+        elseif spectaroryxDDD == 3 then
+            gradient(x + 1,y, w/2 -1, h-17, 0, 72, 252, 255, 232, 52, 235, 255,true)
+        gradient(x + 75,y, w/2 -1, h-17, 232, 52, 235, 255, 123, 255, 0, 255,true)
+
+        end   
+        render.draw_rect(x,y, w, h-17, color.new(25, 25, 25, 255))
+        render.draw_text(smallfont, x+50,y + 2,color.new(255,255,255), title_spectators)
+        for i = 1, #players, 1 do
+            render.draw_rect_filled(x,y+spacing+8, w,13, color.new(35,35,35,255))
+            render.draw_text(smallfont, x + 5,y+ 7 +spacing,color.new(255,255,255), players[i].name)
+            spacing = spacing + 12
+        end
+    end
+end
+
+client.add_callback("on_paint", function()
+    get_spectating_players()
+    paintspec()
+end)
+
+local function ragebot()
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    if localplayer:get_health() < 1 then return end
+    local weap = entitylist.get_weapon_by_player(localplayer)
+    if not weap then return end
+    local backup_strafe = menu.get_int("misc.automatic_strafe")
+    local idx = weap:get_prop_int("CBaseCombatWeapon", "m_iItemDefinitionIndex")
+    for i = 0,64 do
+        local player = entitylist.get_player_by_index(i)
+        if not player then goto continue end
+        if not player:is_player() then goto continue end
+        local speed = math.sqrt(player:get_prop_float("CBasePlayer", "m_vecVelocity[0]")^2 + player:get_prop_float("CBasePlayer", "m_vecVelocity[1]")^2)
+        local hp = player:get_prop_int("CBasePlayer", "m_iHealth")
+        menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", false)
+        if idx == 38 or idx == 11 then -- auto
+            if boolVars[11][1][1] and misses[i] >= intVars[11][1][1] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            elseif boolVars[11][1][2] and hp <= intVars[11][1][2] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            end
+        elseif idx == 9 then -- awp
+            if boolVars[11][3][1] and misses[i] >= intVars[11][3][1] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            elseif boolVars[11][3][2] and hp <= intVars[11][3][2] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            end
+        elseif idx == 40 then -- scout
+            if boolVars[11][2][1] and misses[i] >= intVars[11][2][1] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            elseif boolVars[11][2][2] and hp <= intVars[11][2][2] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            end
+        elseif idx == 64 then -- r8
+            if boolVars[11][4][1] and misses[i] >= intVars[11][4][1] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            elseif boolVars[11][4][2] and hp <= intVars[11][4][2] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            end
+        elseif idx == 1 then -- deagle
+            if boolVars[11][5][1] and misses[i] >= intVars[11][5][1] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            elseif boolVars[11][5][2] and hp <= intVars[11][5][2] then
+                menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_aim", true)
+            end
+        end
+        if boolVars[47] == true then
+            if not idx == 40 then return end
+            menu.set_float("rage.weapon[3].head_scale", 0.67)
+            menu.set_float("rage.weapon[3].body_scale", 0.65)        
+            if hp > 93 then
+                menu.set_int("rage.weapon[3].hit_chance", 80)
+                menu.set_int("rage.weapon[3].minimum_damage", 100)    
+            elseif hp < 93 and hp >= 82 then
+                menu.set_int("rage.weapon[3].hit_chance", 80)
+                menu.set_int("rage.weapon[3].minimum_damage", hp+5)    
+            elseif hp < 82 and hp >= 12 then
+                menu.set_int("rage.weapon[3].hit_chance", 75)
+                menu.set_int("rage.weapon[3].minimum_damage", hp)   
+            elseif hp < 12 and hp >= 1 then
+                menu.set_int("rage.weapon[3].hit_chance", 79)
+                menu.set_int("rage.weapon[3].minimum_damage", hp) 
+                menu.set_int("rage.weapon[3].force_damage_value", hp) 
+            else
+                menu.set_int("rage.weapon[3].force_damage_value", 5) 
+                menu.set_int("rage.weapon[3].hit_chance", 80)
+                menu.set_int("rage.weapon[3].minimum_damage", 101)                    
+            end
+        end
+        if boolVars[19] == true then
+            if not idx == 64 then return end
+            if hp >= 79 and speed >= 100 then
+                menu.set_bool("rage.weapon[0].automatic_stop", true)
+                menu.set_int("rage.weapon[0].hit_chance", 40)
+                menu.set_int("rage.weapon[0].minimum_damage", 79)
+            elseif hp >= 79 and speed >= 1 and speed <= 100 then
+                menu.set_bool("rage.weapon[0].automatic_stop", true)
+                menu.set_int("rage.weapon[0].hit_chance", 50)
+                menu.set_int("rage.weapon[0].minimum_damage", 81)
+            elseif hp <= 79 and speed >= 1 and speed <= 100 then
+                menu.set_bool("rage.weapon[0].automatic_stop", true)
+                menu.set_int("rage.weapon[0].hit_chance", 49)
+                menu.set_int("rage.weapon[0].minimum_damage", hp)
+            elseif hp <= 79 and speed >= 100 then
+                menu.set_bool("rage.weapon[0].automatic_stop", false)
+                menu.set_int("rage.weapon[0].hit_chance", 55)
+                menu.set_int("rage.weapon[0].minimum_damage", hp)
+            elseif speed < 1 and hp >= 79 then
+                menu.set_bool("rage.weapon[0].automatic_stop", true)
+                menu.set_int("rage.weapon[0].hit_chance", 35)
+                menu.set_int("rage.weapon[0].minimum_damage", 79)
+            elseif speed < 1 and hp <= 79 then
+                menu.set_bool("rage.weapon[0].automatic_stop", true)
+                menu.set_int("rage.weapon[0].hit_chance", 50)
+                menu.set_int("rage.weapon[0].minimum_damage", hp)
+            end
+        end
+
+        ::continue::
+    end
+    if boolVars[3] == true then
+        if not localplayer:is_scoped() then
+            menu.set_int("rage.weapon[2].hit_chance", intVars[8][2])
+        else
+            menu.set_int("rage.weapon[2].hit_chance", intVars[8][5])
+        end
+    end
+    tankAAxDDDDDDDDDDD = intVars[15]
+    if boolVars[4] then
+        if boolVars[24] then
+            console.set_int("net_fakelag", 190)
+        elseif tankAAxDDDDDDDDDDD == 2 then
+            console.set_int("net_fakelag", 310)
+        else
+            console.set_int("net_fakelag", 90)
+        end
+    else
+        console.set_int("net_fakelag", 0)
+    end
+    if boolVars[19] then    
+        console.set_int("cl_clockdrift_max_ms_threadmode", 1)
+        console.set_int("cl_clockdrift_max_ms", 100)
+    end
+    if boolVars[14] == true then
+        local flags = localplayer:get_prop_int("CBasePlayer", "m_fFlags")
+        local on_ground = bit.band(flags, 1) == 1
+        if not on_ground then
+            menu.set_int("rage.weapon[3].hit_chance", intVars[8][6])
+        elseif on_ground then
+            menu.set_int("rage.weapon[3].hit_chance", intVars[8][3])
+        end
+    end
+    if boolVars[5] == true then
+        console.set_int("cl_clock_correction", 0)
+        console.set_int("cl_clock_correction_adjustment_max_amount", -1)
+        console.set_int("cl_clock_correction_adjustment_min_offset", -500)
+        console.set_int("cl_clock_correction_adjustment_max_offset", -1000)
+    end
+    if boolVars[15] == true then
+        console.set_int("cl_clock_correction_force_server_tick", 0)
+    end
+
+    if boolVars[27] == true then
+        console.set_int("zoom_sensitivity_ratio_mouse", 0)
+    end
+end
+
+client.add_callback("on_paint", function()
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    if not boolVars[38] then return end
+    local bOnGround = bit.band(localplayer:get_prop_float("CBasePlayer", "m_fFlags"), bit.lshift(1,0)) ~= 0
+    if not bOnGround then
+        ffi.cast("CCSGOPlayerAnimationState_534535_t**", ffi_helpers.get_entity_address(localplayer:get_index()) + offset_value)[0].flDurationInAir = 99
+        ffi.cast("CCSGOPlayerAnimationState_534535_t**", ffi_helpers.get_entity_address(localplayer:get_index()) + offset_value)[0].flHitGroundCycle = 0
+        ffi.cast("CCSGOPlayerAnimationState_534535_t**", ffi_helpers.get_entity_address(localplayer:get_index()) + offset_value)[0].bHitGroundAnimation = false
+    end
+
+    shared_onground = bOnGround
+end)
+
+client.add_callback("on_paint", function()
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    if not boolVars[38] then return end
+    local bOnGround = bit.band(localplayer:get_prop_float("CBasePlayer", "m_fFlags"), bit.lshift(1,0)) ~= 0
+    ffi.cast("CCSGOPlayerAnimationState_534535_t**", ffi_helpers.get_entity_address(localplayer:get_index()) + offset_value)[0].feet_speed_forwards_or_sideways = 1
+end)
+
+
+
+client.add_callback("on_paint", function()
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    if not boolVars[38] then return end
+    local bOnGround = bit.band(localplayer:get_prop_float("CBasePlayer", "m_fFlags"), bit.lshift(1,0)) ~= 0
+    if bOnGround and not shared_onground then
+        ffi.cast("CCSGOPlayerAnimationState_534535_t**", ffi_helpers.get_entity_address(localplayer:get_index()) + offset_value)[0].flDurationInAir = 0
+    end 
+end)
+
+
+local ffi = require("ffi")
+ffi.cdef[[
+    typedef struct {
+      unsigned short wYear;
+      unsigned short wMonth;
+      unsigned short wDayOfWeek;
+      unsigned short wDay;
+      unsigned short wHour;
+      unsigned short wMinute;
+      unsigned short wSecond;
+      unsigned short wMilliseconds;
+    } SYSTEMTIME, *LPSYSTEMTIME;
+    void GetSystemTime(LPSYSTEMTIME lpSystemTime);
+    void GetLocalTime(LPSYSTEMTIME lpSystemTime);
+]]
+
+local function watermark()
+    local local_time = ffi.new("SYSTEMTIME")
+    ffi.C.GetLocalTime(local_time)
+    
+    watermareczek = intVars[14]
+
+    if watermareczek == 1 then return end
+    local fps = tostring(math.floor(1.0 / globals.get_frametime())) 
+    local ping = tostring(globals.get_ping())
+
+    nexttext = "  " .. string.format('%02d:%02d:%02d', local_time.wHour, local_time.wMinute, local_time.wSecond)
+
+    local text_size = render.get_text_width(font, "LegendSide | " .. username .. " | fps: 999 ", " | Time:" .. nexttext)
+    local screen_x = engine.get_screen_width()
+    local screen_y = engine.get_screen_height()
+
+    if engine.is_in_game() then
+        text_size = render.get_text_width(font, "LegendSide | " .. username .. " | delay: " .. ping .. " | fps: 999 ", "| Time:" .. nexttext)
+    end
+
+    if watermareczek == 2 then
+        render.draw_rect_filled(screen_x - text_size - 99, 1, text_size + 89, 3, akcentlel)
+    elseif watermareczek == 3 then
+        gradient(screen_x - text_size - 99, 1, text_size - 49, 3, 0, 72, 252, 255, 232, 52, 235, 255,true)
+        gradient(screen_x - text_size, 1, text_size - 10, 3, 232, 52, 235, 255, 123, 255, 0, 255,true)
+    end
+
+    render.draw_rect(screen_x - text_size - 99, 1, text_size + 89, 3, color.new(25, 25, 25, 255))
+
+    render.draw_rect_filled(screen_x - text_size - 99, 4, text_size + 89, 17, color.new(0, 0, 0, 155))
+
+    if not engine.is_in_game() then
+        render.draw_text(font, screen_x - text_size - 94, 5, color.new(255, 255, 255, 255), "LegendSide | " .. username .. " | fps: " .. tostring(fps) .. "| Time:" .. nexttext)
+    else
+        render.draw_text(font, screen_x - text_size - 94, 5, color.new(255, 255, 255, 255), "LegendSide | " .. username .. " | delay: " .. ping .. " | fps:" .. tostring(fps) .. "| Time: " .. nexttext)
+        local localplayer = entitylist.get_local_player()
+        if not localplayer then return end
+    end
+end
+
+local fn_change_clantag = utils.find_signature("engine.dll", "53 56 57 8B DA 8B F9 FF 15")
+local set_clantag = ffi.cast("clantag_t", fn_change_clantag)
+
+local clantag_table =
+{
+  "",
+  "L",
+  "L_",
+  "Le",
+  "Leg",
+  "Leg_",
+  "Lege",
+  "Legen",
+  "Legend",
+  "LegendS",
+  "LegendSi",
+  "LegendSid",
+  "LegendSide",
+  "LegendSid<",
+  "LegendSi<",
+  "LegendS<",
+  "Legend<",
+  "Legen<",
+  "Lege<",
+  "Leg<",
+  "Le<",
+  "L<",
+  "<",
+  "<",
+}
+
+old_time = 0
+
+local function clantag()
+    if boolVars[10] then
+        local curtime = math.floor(globals.get_curtime()*1.7)
+        if old_time ~= curtime then
+            set_clantag(clantag_table[curtime % #clantag_table+1], clantag_table[curtime % #clantag_table+1])
+        end
+        old_time = curtime
+    end
+end
+
+function clamp(num, min, max)
+    return math.min(math.max(num, min), max)
+end
+
+local function get_max_desync_delta(p) 
+    local animstate = ffi.cast("struct c_animstate**", ffi_helpers.get_entity_address(p:get_index()) + 0x9960)[0]
+
+    local speedfactor = clamp(animstate.m_flFeetSpeedForwardsOrSideWays, 0, 1)
+    local avg_speedfactor = (animstate.m_flStopToFullRunningFraction * -0.3 - 0.2) * speedfactor + 1
+
+    local duck_amount = animstate.m_fDuckAmount
+
+    if duck_amount > 0 then
+        local max_velocity = clamp(animstate.m_flFeetSpeedForwardsOrSideWays, 0, 1)
+		local duck_speed = duck_amount * max_velocity
+
+		avg_speedfactor = avg_speedfactor + (duck_speed * (0.5 - avg_speedfactor))
+    end
+
+    return 58 * avg_speedfactor
+end
+truetrue = true
+
+local switchn = 0
+taimar = 0
+local function addKeybind(x,y,text,is_active)
+    success = ffi.C.GetCursorPos(pointer)           
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and pointer[0].x >= x and pointer[0].x <= x+20 and pointer[0].y >= y and pointer[0].y <= y+20 then  
+        glow = true 
+    else
+        glow = false
+    end  
+    if ffi.C.GetAsyncKeyState(0x2) ~= 0 and pointer[0].x >= x and pointer[0].x <= x+125 and pointer[0].y >= y and pointer[0].y <= y+60 then  
+        glowe = true 
+    else
+        glowe = false
+    end 
+    if glowe then
+        render.draw_rect_filled(x+85, y + 3, 43, 38, color.new(60, 60, 60, 255))
+        render.draw_rect_filled(x+89, y + 7, 35, 30, color.new(30, 30, 30, 255))
+        if ffi.C.GetAsyncKeyState(0x1) ~= 0 and pointer[0].x >= x+90 and pointer[0].x <= x+120 and pointer[0].y >= y+7 and pointer[0].y <= y+23 then
+            toggle = true 
+            hold = false
+        elseif ffi.C.GetAsyncKeyState(0x1) ~= 0 and pointer[0].x >= x+90 and pointer[0].x <= x+120 and pointer[0].y >= y+24 and pointer[0].y <= y+40 then 
+            toggle = false 
+            hold = true                 
+        end
+    end 
+    if toggle == true and glowe then
+        render.draw_text(font, x+90, y + 24, color.new(255,255,255), "Hold")
+        render.draw_text(font, x+90, y + 7, color.new(47,129,129), "Toggle")
+    elseif toggle == false and glowe then
+        render.draw_text(font, x+90, y + 24, color.new(47,129,129), "Hold")
+        render.draw_text(font, x+90, y + 7, color.new(255,255,255), "Toggle")
+    end   
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and pointer[0].x >= x and pointer[0].x <= x+20 and pointer[0].y >= y and pointer[0].y <= y+20 then
+        if ffi.C.GetAsyncKeyState(0x4) ~= 0 then
+            keybind_used = "M3"
+            keybind_code = 0x4
+        elseif ffi.C.GetAsyncKeyState(0x8) ~= 0 then
+            keybind_used = "BACK"
+            keybind_code = 0x8
+        elseif ffi.C.GetAsyncKeyState(0x9) ~= 0 then
+            keybind_used = "TAB"
+            keybind_code = 0x9
+        elseif ffi.C.GetAsyncKeyState(0x0D) ~= 0 then
+            keybind_used = "ENTER"
+            keybind_code = 0x0D
+        elseif ffi.C.GetAsyncKeyState(0x10) ~= 0 then
+            keybind_used = "SHIFT"
+            keybind_code = 0x10
+        elseif ffi.C.GetAsyncKeyState(0x11) ~= 0 then
+            keybind_used = "CNTR"
+            keybind_code = 0x10
+        elseif ffi.C.GetAsyncKeyState(0x12) ~= 0 then
+            keybind_used = "ALT"
+            keybind_code = 0x12
+        elseif ffi.C.GetAsyncKeyState(0x14) ~= 0 then
+            keybind_used = "CAPS"
+            keybind_code = 0x14
+        elseif ffi.C.GetAsyncKeyState(0x20) ~= 0 then
+            keybind_used = "SPBAR"
+            keybind_code = 0x20
+        elseif ffi.C.GetAsyncKeyState(0x25) ~= 0 then
+            keybind_used = "LFT"
+            keybind_code = 0x25
+        elseif ffi.C.GetAsyncKeyState(0x26) ~= 0 then
+            keybind_used = "UP"
+            keybind_code = 0x26
+        elseif ffi.C.GetAsyncKeyState(0x27) ~= 0 then
+            keybind_used = "RGHT"
+            keybind_code = 0x27
+        elseif ffi.C.GetAsyncKeyState(0x28) ~= 0 then
+            keybind_used = "DOWN"
+            keybind_code = 0x28
+        elseif ffi.C.GetAsyncKeyState(0x30) ~= 0 then
+            keybind_used = "ZERO"
+            keybind_code = 0x30
+        elseif ffi.C.GetAsyncKeyState(0x31) ~= 0 then
+            keybind_used = "1"
+            keybind_code = 0x31
+        elseif ffi.C.GetAsyncKeyState(0x32) ~= 0 then
+            keybind_used = "2"
+            keybind_code = 0x32
+        elseif ffi.C.GetAsyncKeyState(0x33) ~= 0 then
+            keybind_used = "3"
+            keybind_code = 0x33
+        elseif ffi.C.GetAsyncKeyState(0x34) ~= 0 then
+            keybind_used = "4"
+            keybind_code = 0x34
+        elseif ffi.C.GetAsyncKeyState(0x35) ~= 0 then
+            keybind_used = "5"
+            keybind_code = 0x35
+        elseif ffi.C.GetAsyncKeyState(0x36) ~= 0 then
+            keybind_used = "6"
+            keybind_code = 0x36
+        elseif ffi.C.GetAsyncKeyState(0x37) ~= 0 then
+            keybind_used = "7"
+            keybind_code = 0x37
+        elseif ffi.C.GetAsyncKeyState(0x38) ~= 0 then
+            keybind_used = "8"
+            keybind_code = 0x38
+        elseif ffi.C.GetAsyncKeyState(0x39) ~= 0 then
+            keybind_used = "9"
+            keybind_code = 0x39
+        elseif ffi.C.GetAsyncKeyState(0x41) ~= 0 then
+            keybind_used = "A"
+            keybind_code = 0x41
+        elseif ffi.C.GetAsyncKeyState(0x42) ~= 0 then
+            keybind_used = "B"
+            keybind_code = 0x42
+        elseif ffi.C.GetAsyncKeyState(0x43) ~= 0 then
+            keybind_used = "C"
+            keybind_code = 0x43
+        elseif ffi.C.GetAsyncKeyState(0x44) ~= 0 then
+            keybind_used = "D"
+            keybind_code = 0x44
+        elseif ffi.C.GetAsyncKeyState(0x45) ~= 0 then
+            keybind_used = "E"
+            keybind_code = 0x45
+        elseif ffi.C.GetAsyncKeyState(0x46) ~= 0 then
+            keybind_used = "F"
+            keybind_code = 0x46
+        elseif ffi.C.GetAsyncKeyState(0x47) ~= 0 then
+            keybind_used = "G"
+            keybind_code = 0x47
+        elseif ffi.C.GetAsyncKeyState(0x48) ~= 0 then
+            keybind_used = "H"
+            keybind_code = 0x48
+        elseif ffi.C.GetAsyncKeyState(0x49) ~= 0 then
+            keybind_used = "I"
+            keybind_code = 0x49
+        elseif ffi.C.GetAsyncKeyState(0x4A) ~= 0 then
+            keybind_used = "J"
+            keybind_code = 	0x4A
+        elseif ffi.C.GetAsyncKeyState(0x4B) ~= 0 then
+            keybind_used = "K"
+            keybind_code = 	0x4B
+        elseif ffi.C.GetAsyncKeyState(0x4C) ~= 0 then
+            keybind_used = "L"
+            keybind_code = 	0x4C
+        elseif ffi.C.GetAsyncKeyState(0x4D) ~= 0 then
+            keybind_used = "M"
+            keybind_code = 	0x4D
+        elseif ffi.C.GetAsyncKeyState(0x4E) ~= 0 then
+            keybind_used = "N"
+            keybind_code = 	0x4E
+        elseif ffi.C.GetAsyncKeyState(0x4F) ~= 0 then
+            keybind_used = "O"
+            keybind_code = 	0x4F  
+        elseif ffi.C.GetAsyncKeyState(0x50) ~= 0 then
+            keybind_used = "P"
+            keybind_code = 0x50
+        elseif ffi.C.GetAsyncKeyState(0x51) ~= 0 then
+            keybind_used = "Q"
+            keybind_code = 0x51
+        elseif ffi.C.GetAsyncKeyState(0x52) ~= 0 then
+            keybind_used = "R"
+            keybind_code = 0x52
+        elseif ffi.C.GetAsyncKeyState(0x53) ~= 0 then
+            keybind_used = "S"
+            keybind_code = 0x53
+        elseif ffi.C.GetAsyncKeyState(0x54) ~= 0 then
+            keybind_used = "T"
+            keybind_code = 0x54
+        elseif ffi.C.GetAsyncKeyState(0x55) ~= 0 then
+            keybind_used = "U"
+            keybind_code = 0x55
+        elseif ffi.C.GetAsyncKeyState(0x56) ~= 0 then
+            keybind_used = "V"
+            keybind_code = 0x56
+        elseif ffi.C.GetAsyncKeyState(0x57) ~= 0 then
+            keybind_used = "W"
+            keybind_code = 0x57
+        elseif ffi.C.GetAsyncKeyState(0x58) ~= 0 then
+            keybind_used = "X"
+            keybind_code = 0x58
+        elseif ffi.C.GetAsyncKeyState(0x59) ~= 0 then
+            keybind_used = "Y"
+            keybind_code = 0x59
+        elseif ffi.C.GetAsyncKeyState(0x5A) ~= 0 then
+            keybind_used = "Z"
+            keybind_code = 0x5A
+        elseif ffi.C.GetAsyncKeyState(0x45) ~= 0 then
+            keybind_used = "E"
+            keybind_code = 0x45
+        end
+    end
+    if switchn == 0 then
+        taimar = taimar + 1
+        switchn = 1
+    end
+    if switchn == 1 then
+        switchn = 0 
+    end
+    if hold == true and ffi.C.GetAsyncKeyState(keybind_code) ~= 0 then 
+        is_active = true 
+    else 
+        is_active = false 
+    end 
+    if ffi.C.GetAsyncKeyState(keybind_code) ~= 0 and taimar >= 50 and toggled_key == false then
+        toggled_key = true
+        taimar = 0
+    end
+    if ffi.C.GetAsyncKeyState(keybind_code) ~= 0 and taimar >= 50 and toggled_key == true then
+        toggled_key = false
+        taimar = 0
+    end
+    if toggle then
+        is_active = toggled_key
+    end
+    if glow then
+        render.draw_circle_filled(x-2, y-2, 30, 3, akcentlel)
+        render.draw_circle_filled(x+41, y-2, 30, 3, akcentlel)
+        render.draw_circle_filled(x-2, y+22, 30, 3, akcentlel)
+        render.draw_circle_filled(x+41, y+22, 30, 3, akcentlel)
+        render.draw_rect_filled(x-3, y-5, 43, 30, akcentlel)
+        render.draw_rect_filled(x-5, y-2, 49, 25, akcentlel)
+        render.draw_rect_filled(x-2, y-2, 43, 24, color.new(60, 60, 60, 255))
+        render.draw_rect_filled(x, y, 38, 20, color.new(105, 105, 105, 255))
+    else
+        render.draw_circle_filled(x-2, y-2, 30, 3, akcentlel)
+        render.draw_circle_filled(x+41, y-2, 30, 3, akcentlel)
+        render.draw_circle_filled(x-2, y+22, 30, 3, akcentlel)
+        render.draw_circle_filled(x+41, y+22, 30, 3, akcentlel)
+        render.draw_rect_filled(x-3, y-5, 43, 30, akcentlel)
+        render.draw_rect_filled(x-5, y-2, 49, 25, akcentlel)
+        render.draw_rect_filled(x-2, y-2, 43, 24, color.new(60, 60, 60, 255))
+        render.draw_rect_filled(x, y, 38, 20, color.new(30, 30, 30, 255))
+    end
+    render.draw_text(font, x+2, y + 5, color.new(255,255,255), keybind_used)
+    render.draw_text(font, x+47, y + 5, color.new(255,255,255), text)
+    return is_active,toggle,hold    
+end
+local ffi_helpers = {
+    get_animstate_offset = function()
+        return 0x9960
+    end,
+
+    get_entity_address = function(ent_index)
+        local addr = get_client_entity_fn(entity_list_ptr, ent_index)
+        return addr
+    end
+}
+
+local angles1 = {
+    [1] = 60,
+    [2] = -40,
+    [3] = 30,
+}
+
+local angles2 = {
+    [1] = -60,
+    [2] = 40,
+    [3] = 30,
+}
+
+
+
+
+local function resolver(cmd)
+    for i = 0,64 do
+        if not entitylist.get_player_by_index(i) then goto next end
+        if not entitylist.get_player_by_index(i):is_player() then goto next end
+        if intVars[5] == 1 then
+            menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_yaw", false)
+        else
+            menu.set_bool("player_list.player_settings[" .. tostring(i) .. "].force_body_yaw", true)
+            local player = entitylist.entity_to_player(entitylist.get_player_by_index(i))      
+            local lp = entitylist.get_local_player()
+            entity_angle = calculateAngle(get_eye_position(lp, cmd), player:get_origin())
+            entity_eye_yaw = get_eye_position(player, cmd)
+            local state = ffi.cast("struct c_animstate**", ffi_helpers.get_entity_address(player:get_index()) + 0x9960)[0]
+            local layers3 = ffi.cast("struct animation_layer_t**", ffi_helpers.get_entity_address(player:get_index()) + 0x9960)[0][3]
+            local layers6 = ffi.cast("struct animation_layer_t**", ffi_helpers.get_entity_address(player:get_index()) + 0x9960)[0][6]
+            local logic = 1 
+            local last_layer = layers6           
+            if layers3.m_flCycle == 0 and layers3.m_flWeight == 0 then
+                logic = 1
+            elseif layers6.m_flCycle - last_layer.m_flCycle > 1000 then
+                logic = 2
+            elseif state.m_flFeetYawRate > 0.2 and state.m_flFeetYawRate < 0.8 then
+                logic = 2
+            end
+            local side = "left"
+            for i = entity_angle.x - 90, entity_angle.x + 90, 25 do
+                if i ~= entity_angle.x then
+                    if i < entity_angle.x then        
+                        side = "left"
+                    else
+                        side = "right"
+                    end
+                end
+            end
+            last_layer = layers6
+            if entity_angle.y >= -10 and entity_angle.y <= 10 then
+                if side == "right" then
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", -math.min(toint(get_max_desync_delta(player))))
+                elseif side == "left" then 
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", math.min(toint(get_max_desync_delta(player))))
+                end
+            end
+            if entity_angle.y >= -10 and entity_angle.y <= 10 then return end
+            if side == "left" then
+                if logic == 1 then
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", math.min(toint(get_max_desync_delta(player)), angles2[misses[i] + 1]))
+                else
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", math.min(toint(get_max_desync_delta(player)), angles1[misses[i] + 1]))
+                end
+            end
+            if side == "right" then
+                if logic == 1 then
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", math.min(toint(get_max_desync_delta(player)), -angles2[misses[i] + 1]))
+                else
+                    menu.set_int("player_list.player_settings[" .. tostring(i) .. "].body_yaw", math.min(toint(get_max_desync_delta(player)), -angles1[misses[i] + 1]))
+                end
+            end
+        end 
+        ::next::       
+    end
+end
+
+client.add_callback("on_shot", function(shot_info) 
+    if not boolVars[45] then return end
+    if shot_info.result == "Resolver" then
+        if side == "right" then
+            side = "left"
+        end
+        if side == "left" then
+            side = "right"
+        end
+    end
+end)
+
+local smallfontxd = render.create_font("Calibri", 15, 100, true, false, false)
+local screen_width = engine.get_screen_width()
+local screen_height = engine.get_screen_height()
+local x, y= engine.get_screen_width()/2,engine.get_screen_height()/2
+
+client.add_callback("on_paint", function()
+    idealyawindicator = intVars[7]
+    if idealyawindicator == 2 then 
+        local lp = entitylist.get_local_player()
+        if not lp then return end
+        local add_y = 13
+        local realtime_fade = math.floor(math.sin(globals.get_realtime() * 2) * 127 + 128)
+        render.draw_text(smallfontxd, engine.get_screen_width()/2-33, engine.get_screen_height()/2 +10,color.new(251, 157, 57),"LEGENDYAW")
+        render.draw_text(smallfontxd, engine.get_screen_width()/2-24, engine.get_screen_height()/2 +23,color.new(166, 130, 250),"DYNAMIC")
+        if (menu.get_key_bind_state("rage.force_damage_key")) then
+            render.draw_text(smallfontxd, engine.get_screen_width()/2-12, engine.get_screen_height()/2 +23+add_y,color.new(166, 130, 250),"DMG")
+           add_y = add_y + 13
+        end
+        if (menu.get_key_bind_state("misc.automatic_peek_key")) then
+            render.draw_text(smallfontxd, engine.get_screen_width()/2-16, engine.get_screen_height()/2 +23+add_y,color.new(166, 130, 250),"AUTO")
+            add_y = add_y + 13
+        end
+        if (menu.get_key_bind_state("anti_aim.fake_duck_key")) then
+            render.draw_text(smallfontxd, engine.get_screen_width()/2-7, engine.get_screen_height()/2 +23+add_y,color.new(166, 130, 250),"FD")
+            add_y = add_y + 13
+         end
+        if (menu.get_key_bind_state("rage.hide_shots_key")) then
+            render.draw_text(smallfontxd, engine.get_screen_width()/2-7, engine.get_screen_height()/2 +23+add_y,color.new(166, 130, 250),"HS")
+            add_y = add_y + 13
+        end
+        if (menu.get_key_bind_state("rage.double_tap_key")) then
+            render.draw_text(smallfontxd, engine.get_screen_width()/2-7, engine.get_screen_height()/2 +23+add_y,color.new(166, 130, 250),"DT")
+            add_y = add_y + 13
+        end
+    end
+end)
+
+local smallfont2 = render.create_font("Calibri", 13, 16, true, false, false)
+local smallfonte2 = render.create_font("Calibri", 13, 16, true, false, false)
+local used = render.create_font("Verdana", 16, 100, false, false, true)
+local bigused = render.create_font("Verdana", 33, 100, true, false, false)
+local bigunused = render.create_font("Verdana", 26, 100, false, false, true)
+local screen_width = engine.get_screen_width()
+local screen_height = engine.get_screen_height()
+local x, y= engine.get_screen_width()/2,engine.get_screen_height()/2
+
+client.add_callback("on_paint", function()
+    idealyawindicator = intVars[7]
+    if idealyawindicator == 3 then 
+        local local_ent = entitylist.get_local_player()
+        if not engine.is_in_game() then return end
+        local local_ent_vel = local_ent:get_velocity()
+        local screen_width = engine.get_screen_width()
+        local screen_height = engine.get_screen_height()
+        local maxvalue=25
+        local minvalue=12
+        local add_y = 15
+        local counter =0
+        local realtime_fade = math.floor(math.sin(globals.get_realtime() * 2) * 127 + 128)
+        local recolor = math.floor(math.sin(globals.get_realtime()) * 256)
+        local textcolor=200
+        local desync_offset= menu.get_int("anti_aim.desync_range")
+        local yaw_offset= menu.get_int("anti_aim.yaw_offset")
+        local linesize = menu.get_int("anti_aim.desync_range")
+        linecentering = linesize*0.5
+
+
+        render.draw_text(smallfont, engine.get_screen_width()/2-25, engine.get_screen_height()/2 +30,color.new(245, 205, 73),"Legend")
+        render.draw_text(smallfont, engine.get_screen_width()/2+10, engine.get_screen_height()/2 +30,color.new(48, 48, 48,realtime_fade),"SIDE")
+        render.draw_rect_filled((engine.get_screen_width()/2 -linecentering),engine.get_screen_height()/2+45, linesize, 2 ,color.new(105, 157, 255, 255))
+        gradient((engine.get_screen_width()/2 -linecentering),engine.get_screen_height()/2+45, linesize, 2 ,105, 157, 255, 255, 105, 157, 255, 255, false)
+    if (desync_offset==22) and (yaw_offset==20) then 
+            render.draw_text(smallfont, engine.get_screen_width()/2-25, engine.get_screen_height()/2 +50,color.new(180, 224, 135),"DISTANCE")
+        elseif menu.get_key_bind_state("anti_aim.manual_left_key" )then 
+              render.draw_text(smallfont, engine.get_screen_width()/2-20, engine.get_screen_height()/2 +50,color.new(159, 126, 214),"MANUAL")
+        elseif menu.get_key_bind_state("anti_aim.manual_right_key" )then 
+            render.draw_text(smallfont, engine.get_screen_width()/2-20, engine.get_screen_height()/2 +50,color.new(159, 126, 214),"MANUAL")
+
+        else
+            render.draw_text(smallfont, engine.get_screen_width()/2 -21,  engine.get_screen_height()/2 +50 ,color.new(252, 127, 3),"DYNAMIC")
+
+    end
+         
+if menu.get_key_bind_state("rage.hide_shots_key" ) then 
+
+    render.draw_text(smallfont, engine.get_screen_width()/2-12 , engine.get_screen_height()/2 + 50 + add_y,color.new(93, 146, 252, 255),"HIDE")
+    add_y= add_y + 15
+end
+
+if menu.get_key_bind_state("rage.double_tap_key" ) and menu.get_key_bind_state("anti_aim.fake_duck_key") then
+  render.draw_text(smallfont, engine.get_screen_width()/2-5, engine.get_screen_height()/2 +50 + add_y,color.new(255, 0, 0, 255),"DT")
+  add_y =  add_y + 15
+end
+
+if menu.get_key_bind_state("rage.double_tap_key" ) then 
+  render.draw_text(smallfont, engine.get_screen_width()/2-5, engine.get_screen_height()/2 +50 + add_y,color.new(59, 255, 75, 255),"DT")
+  add_y =  add_y + 15
+
+end
+
+if (menu.get_key_bind_state("misc.automatic_peek_key")) then
+    render.draw_text(smallfont, engine.get_screen_width()/2-8, engine.get_screen_height()/2 +50 + add_y,color.new(59, 255, 75, 255),"Peek")
+    add_y =  add_y + 15
+end
+
+if (menu.get_key_bind_state("rage.force_damage_key")) then
+    render.draw_text(smallfont, engine.get_screen_width()/2-8, engine.get_screen_height()/2 +50 + add_y,color.new(59, 255, 75, 255),"Dmg")
+   add_y = add_y + 15
+end
+
+end
+end)
+
+local ffi = require('ffi')
+ffi.cdef[[
+    typedef struct
+    {
+        float x;
+        float y;
+        float z;
+    } Vector_t;
+    typedef uintptr_t (__thiscall* GetClientEntity_4242425_t)(void*, int);
+]]
+
+local entity_list_ptr = ffi.cast("void***", utils.create_interface("client.dll", "VClientEntityList003"))
+local get_client_entity_fn = ffi.cast("GetClientEntity_4242425_t", entity_list_ptr[0][3])
+
+local ffi_helpers = {
+    get_entity_address = function(ent_index)
+        local addr = get_client_entity_fn(entity_list_ptr, ent_index)
+        return addr
+    end
+}
+
+local fonts = {
+    main = render.create_font( "smallest pixel-7", 14, 300, true, true),
+    main_height = 14,
+    second = render.create_font( "smallest pixel-7", 12, 300, true, true, false),
+    second_height = 12,
+    db_point = render.create_font( "verdana", 12, 300, true, true, false),
+}
+local screen = {
+    x = engine.get_screen_width(),
+    y = engine.get_screen_height()
+}
+
+function get_baim(number)
+    return menu.get_int("rage.weapon["..tonumber(number).."].body_aim   ")
+end
+
+eyepos = {0,0,0}
+client.add_callback("on_paint", function()
+    local acaterlindicatory = intVars[7]
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    local indicators = {}
+    indicators.is_active = false
+    indicators.name = ""
+    indicators.color = color.new()
+    local top_color = akcentlel
+    local other_color = color.new(255,255,255)
+    local disabled_color = color.new(100,100,100)
+    local exploit_custom_color = color.new(242, 30, 15)
+    alpha = 1.1
+    alpha = math.min(math.floor(math.sin((globals.get_realtime() % 3) * 4) * 125 + 200), 255)
+
+    local flag = entitylist.get_local_player():get_prop_int("CBasePlayer", "m_fFlags")
+    local int = 0
+
+    if flag == 256 or flag == 262 then
+        int = 0
+    end
+
+    if flag == 257 or flag == 261 or flag == 263 then
+       int = 1
+    end
+    if acaterlindicatory == 4 then
+        local aa_side = ""
+        if menu.get_key_bind_state("anti_aim.invert_desync_key") then
+            aa_side = "R"
+        else
+            aa_side = "L"
+        end
+        local body_aim = false
+        
+        if get_baim(0) ~= 2 and get_baim(1) ~= 2 and get_baim(2) ~= 2 and get_baim(3) ~= 2 and get_baim(4) ~= 2 and get_baim(5) ~= 2 and get_baim(6) ~= 2 and get_baim(7) ~= 2 and get_baim(8) ~= 2 then
+            body_aim = false
+        else
+            body_aim = true
+        end
+        if menu.get_key_bind_state( "anti_aim.fake_duck_key" ) then
+            exploit_custom_color = color.new(242, 30, 15)
+        else
+            exploit_custom_color = other_color
+        end
+
+        
+        local baseyaw_text = ""
+        for i = 1, globals.get_maxclients(), 1 do
+            ent = entitylist.get_player_by_index(i)
+            player = entitylist.entity_to_player(ent)
+            if ent == nil then goto continue end
+            if player:get_dormant() then
+                baseyaw_text = "DORMANCY"
+            elseif int < 1 then
+                baseyaw_text = "DEFENSIVE"
+            elseif menu.get_key_bind_state("misc.slow_walk_key") then
+                baseyaw_text = "SAFE"
+            else
+                baseyaw_text = "BASEYAW"
+            end
+            ::continue::
+        end
+
+        table.insert(indicators, {is_active = menu.get_key_bind_state( "rage.double_tap_key" ), name = "DT", color = exploit_custom_color})
+        table.insert(indicators, {is_active = menu.get_key_bind_state( "rage.hide_shots_key" ), name = "HS", color = exploit_custom_color})
+        table.insert(indicators, {is_active = menu.get_key_bind_state( "rage.force_damage_key" ), name = "DMG", color = other_color})
+        table.insert(indicators, {is_active = body_aim, name = "BAIM", color = other_color})
+
+        render.draw_text(smallfont, screen.x/2 + 5, screen.y/2 + 10, color.new(top_color:r(),top_color:g(),top_color:b(),255), "LEGEND")
+        render.draw_text(smallfont, screen.x/2 + render.get_text_width(fonts.main, "LEGEND"), screen.y/2 + 10, color.new(150,150,150,alpha - 40), "SIDE")
+        render.draw_text(smallfont, screen.x/2 + 5, screen.y/2 + 6 + fonts.main_height, other_color, baseyaw_text)
+        render.draw_text(smallfont,screen.x/2 + 5 + render.get_text_width(fonts.second, baseyaw_text), screen.y/2 + 5 + fonts.main_height, other_color, ":")
+        render.draw_text(smallfont, screen.x/2 + 5 + render.get_text_width(fonts.second, baseyaw_text) + render.get_text_width(fonts.db_point, ":"), screen.y/2 + 6 + fonts.main_height, other_color, aa_side)
+        render.draw_text(smallfont, screen.x/2 + 5, screen.y/2 + 6 + fonts.main_height, other_color, baseyaw_text)
+        local spacing = 0
+        local side_space = 0
+        for i=1,#indicators,1 do
+            local name = indicators[i].name
+            local is_active = indicators[i].is_active
+
+            if name == "DT" or name == "HS" then
+                if is_active then
+                    render.draw_text( smallfont, screen.x/2 + 5, screen.y/2 + fonts.second_height + 2 + fonts.main_height + spacing, indicators[i].color, name )
+                    spacing = spacing + fonts.second_height/2 + 2
+                else
+                    render.draw_text( smallfont, screen.x/2 + 5, screen.y/2 + fonts.second_height + 2 + fonts.main_height + spacing, disabled_color, name )
+                    spacing = spacing + fonts.second_height/2 + 2
+                end
+            else
+                if is_active then
+                    render.draw_text( smallfont, screen.x/2 + 5 + side_space + render.get_text_width( fonts.second, "HS" ) + 3, screen.y/2 + (fonts.second_height * 2)/1.05 + fonts.main_height, indicators[i].color, name)
+                    side_space = side_space + render.get_text_width(fonts.second, name) + 3
+                else
+                    render.draw_text( smallfont, screen.x/2 + 5 + side_space + render.get_text_width( fonts.second, "HS" ) + 3, screen.y/2 + (fonts.second_height * 2)/1.05 + fonts.main_height, disabled_color, name)
+                    side_space = side_space + render.get_text_width(fonts.second, name) + 3
+                end
+            end
+        end
+    end
+
+    local position = render.world_to_screen(entitylist.get_local_player():get_origin())
+    if boolVars[26] == true and menu.get_key_bind_state("misc.third_person_key") then
+        e_orig = ffi.cast("Vector_t*",ffi_helpers.get_entity_address(entitylist.get_local_player():get_index())+312)
+        viewoffset = ffi.cast("Vector_t*",ffi_helpers.get_entity_address(entitylist.get_local_player():get_index())+264)
+        eyepos[1] = e_orig.x + viewoffset.x
+        eyepos[2] = e_orig.y + viewoffset.y
+        eyepos[3] = e_orig.z + viewoffset.z
+        newang = render.world_to_screen( vector.new(eyepos[1], eyepos[2],eyepos[3]) )
+        local defpos_x = position.x + 250
+        local defpos_y = position.y - 350
+        local sidetext = ""
+        local desyncangle = ""
+        local choke
+        local getmathpos_x = 0
+        local spacing = 5
+        local y_spacing = 3
+        local speed = localplayer:get_velocity():length_2d()
+        if menu.get_key_bind_state("anti_aim.invert_desync_key") then
+            sidetext = "RIGHT"
+            desyncangle = menu.get_int("anti_aim.desync_range_inverted")
+            getmathpos_x = math.floor(desyncangle/1.5)
+        else
+            sidetext = "LEFT"
+            desyncangle = menu.get_int("anti_aim.desync_range")
+            getmathpos_x = -math.floor(desyncangle/1.5)
+        end
+        if menu.get_key_bind_state( "rage.double_tap_key" ) or menu.get_key_bind_state( "rage.hide_shots_key" ) or not menu.get_bool("anti_aim.enable_fake_lag") then
+            choke = nil
+        else
+            choke = math.floor(menu.get_int("anti_aim.fake_lag_limit") * 5.6)
+        end
+        render.draw_line(newang.x + (getmathpos_x), newang.y + 40, defpos_x, defpos_y - 2, color.new(255,255,255,255))
+        render.draw_rect_filled(defpos_x, defpos_y, 180, 75, color.new(0,0,0,50))
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y - fonts.main_height - 2, color.new(top_color:r(),top_color:g(),top_color:b(),255), "LEGEND")
+        render.draw_text(smallfont, defpos_x + spacing + render.get_text_width(fonts.main, "LEGEND") + 1, defpos_y - fonts.main_height - 2, color.new(150,150,150,alpha - 40), "SIDE")
+        render.draw_rect_filled( defpos_x, defpos_y - 2, 180, 2, color.new(top_color:r(),top_color:g(),top_color:b(),255) )
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y + y_spacing, color.new(255,255,255), "ANTIAIM")
+        render.draw_text(smallfont, defpos_x + spacing + render.get_text_width(smallfont, "ANTIAIM") + 4, defpos_y + y_spacing, color.new(255,255,255), "DEBUG")
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y + y_spacing + fonts.main_height, color.new(255,255,255), "DESYNC")
+        render.draw_text(smallfont, defpos_x + spacing + render.get_text_width(smallfont, "DESYNC") + 2, defpos_y + y_spacing + fonts.main_height, color.new(top_color:r(),top_color:g(),top_color:b(),255), sidetext)
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y + y_spacing + fonts.main_height * 2, color.new(255,255,255), "FAKE")
+        render.draw_text(smallfont, defpos_x + spacing + render.get_text_width( smallfont, "FAKE" ) + 2, defpos_y + y_spacing + fonts.main_height * 2, color.new(top_color:r(),top_color:g(),top_color:b(),255), "("..desyncangle.."°)")
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y + y_spacing + fonts.main_height * 3, color.new(255,255,255), "SP")
+        render.draw_rect_filled( defpos_x + spacing + render.get_text_width(smallfont, "SP") + 2, defpos_y + y_spacing + fonts.main_height * 3 + fonts.main_height/2 , speed / 5, 2, color.new(top_color:r(),top_color:g(),top_color:b(),255) )
+        local choke_text = ""
+        local choke_color = color.new()
+        local shift
+        local exploit_ready
+        if menu.get_key_bind_state( "rage.double_tap_key" ) then exploit_ready = "(READY DT)" elseif menu.get_key_bind_state( "rage.hide_shots_key" ) then exploit_ready = "(READY HS)" else exploit_ready = "NONE" end
+        if choke == nil then
+            choke_text = "SHIFTING TICKBASE" .. exploit_ready
+            choke_color = color.new(150,150,150, alpha)
+            shift = true
+        else
+            choke_text = "CHOKE"
+            choke_color = color.new(255,255,255, 255)
+            shift = false
+        end
+        render.draw_text(smallfont, defpos_x + spacing, defpos_y + y_spacing + fonts.main_height * 4, choke_color, choke_text)
+        if not shift then
+            render.draw_rect_filled(defpos_x + spacing + render.get_text_width(smallfont, "CHOKE")+ 2, defpos_y + y_spacing + fonts.main_height * 4 + fonts.main_height/2  , choke,  2, color.new(top_color:r(),top_color:g(),top_color:b(),255))
+            render.draw_text(smallfont, defpos_x + spacing + choke + render.get_text_width(fonts.main, "CHOKE") + 4, defpos_y + y_spacing + fonts.main_height * 4, color.new(top_color:r(),top_color:g(),top_color:b(),255), tostring(menu.get_int("anti_aim.fake_lag_limit")) .. "FL")
+        end
+    end
+end)
+
+local function slow_walk(cmd)
+    if not menu.get_key_bind_state("misc.slow_walk_key") then return end
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    local forward = bit.band(cmd.buttons, 8) == 8
+    local back = bit.band(cmd.buttons, 16) == 16
+    local right = bit.band(cmd.buttons, 512) == 512
+    local left = bit.band(cmd.buttons, 1024) == 1024
+    local forwardspeed = 0
+    local sidespeed = 0
+    if forward then
+        forwardspeed = forwardspeed + intVars[2]
+    end
+    if back then
+        forwardspeed = forwardspeed - intVars[2]
+    end
+    if right then
+        sidespeed = sidespeed - intVars[2]
+    end
+    if left then
+        sidespeed = sidespeed + intVars[2]
+    end
+
+    cmd.forwardmove = forwardspeed
+    cmd.sidemove = sidespeed
+end
+
+
+local function CSGO_Armor(dmg, armor)
+    local flArmorRatio = 0.5
+    local flArmorBonus = 0.5
+    if armor > 0 then
+        local flNew = dmg * flArmorRatio
+        local flArmor = (dmg - flNew) * flArmorBonus
+        if flArmor > armor then
+            flArmor = armor * (1 / flArmorBonus)
+            flNew = flDamage - flArmor
+        end
+        dmg = flNew
+    end
+
+    return dmg
+end
+
+local g_VGuiSurface = ffi.cast(ffi.typeof("void***"), utils.create_interface("vguimatsurface.dll", "VGUI_Surface031"))
+local native_Surface_DrawSetColor = ffi.cast(ffi.typeof("void(__thiscall*)(void*, int, int, int, int)"), g_VGuiSurface[0][15])
+local native_Surface_DrawFilledRectFade = ffi.cast(ffi.typeof("void(__thiscall*)(void*, int, int, int, int, unsigned int, unsigned int, bool)"), g_VGuiSurface[0][123])
+
+function gradient(x, y, w, h, r0, g0, b0, a0, r1, g1, b1, a1, horizontal)
+    native_Surface_DrawSetColor(g_VGuiSurface,r0, g0, b0, a0)
+    native_Surface_DrawFilledRectFade(g_VGuiSurface,x, y, x + w, y + h, a0, 0, horizontal)
+    native_Surface_DrawSetColor(g_VGuiSurface,r1, g1, b1, a1)
+    return native_Surface_DrawFilledRectFade(g_VGuiSurface,x, y, x + w, y + h, 0, a1, horizontal)
+end
+
+function circlePart(x, y, r, t, c, p)
+    local step = (math.pi * 2) / 60
+    local steps = step * (p / 6)
+    local prev_pos = {0, 0}
+    local prev_pos2 = {0, 0}
+    local rot = 0
+    while rot <= steps do
+        rot = rot + step
+        if rot == step then
+            local pos_down = {x + (r - t) * math.cos(rot), y + (r - t) * math.sin(rot)}
+            local pos = {x + r * math.cos(rot), y + r * math.sin(rot)}
+            prev_pos = pos
+            prev_pos2 = pos_down
+        else
+            local pos_down = {x + (r - t) * math.cos(rot), y + (r - t) * math.sin(rot)}
+            local pos = {x + r * math.cos(rot), y + r * math.sin(rot)}
+            render.draw_triangle(pos_down[1], pos_down[2], prev_pos[1], prev_pos[2], pos[1], pos[2], c)
+            render.draw_triangle(prev_pos[1], prev_pos[2], pos_down[1], pos_down[2], prev_pos2[1], prev_pos2[2], c)
+            prev_pos = pos
+            prev_pos2 = pos_down
+        end
+    end
+end
+
+
+local font_undefeated = render.create_font( "undefeated", 14, 300, true, false, true )
+local segoe = render.create_font("Segoe UI", 16, 400, true, true, false)
+local backup = {
+    did = false,
+    fl = false,
+    strafe = 0,
+}
+local viewangles = vector.new(0, 0, 0)
+
+
+nadeName = {
+    [46] = "weapon_molotov",
+    [48] = "weapon_molotov",
+    [44] = "weapon_hegrenade",
+    [45] = "smoke grenade",
+    [43] = "flashbang grenade",
+}
+
+nadeIcon = {
+    [46] = "l",
+    [48] = "n",
+    [44] = "j",
+    [45] = "k",
+    [43] = "i",
+}
+
+function angle_to_vec(pitch, yaw)
+    local p = pitch * math.pi / 180
+    local y = yaw * math.pi / 180
+
+    local sin_p = math.sin(p)
+    local cos_p = math.cos(p)
+    local sin_y = math.sin(y)
+    local cos_y = math.cos(y)
+
+    return vector.new(cos_p * cos_y, cos_p * sin_y, -sin_p)
+end
+
+function get_fov(viewangle, aim)
+    local delta = vector.new(aim.x - viewangle.x, aim.y - viewangle.y, aim.z - viewangle.z)
+    delta.x = math.min(math.max(delta.x, -89), 89)
+    while delta.y > 180 do
+        delta.y = delta.y - 360
+    end
+    while delta.y < -180 do
+        delta.y = delta.y + 360
+    end
+    delta.z = 0
+    return math.min(math.sqrt(math.pow(delta.x, 2) + math.pow(delta.y, 2)), 180)
+end
+
+
+local types = {"always", "holding", "toggled"}
+
+local get_state, get_mode = menu.get_key_bind_state, menu.get_key_bind_mode
+local screen_x, screen_y = engine.get_screen_width(), engine.get_screen_height()
+local count = 0
+
+pos_x = 0
+pos_y = 560
+alphadt = 0
+alphahs = 0       
+alphafd = 0   
+alphasw = 0 
+alphaap = 0  
+zielone1, zielone2, zielone3 = 255, 255, 255    
+zielone4, zielone5, zielone6 = 255, 255, 255                 
+local function on_paint()
+    local gaybindys = intVars[13]
+    if gaybindys == 1 then return end
+    local mousePos = getMousePos()
+    if asyncKeyState(0x1) then
+        if mousePos.x >= pos_x-15 and mousePos.x <= pos_x + 150 and mousePos.y >= pos_y-5 and mousePos.y <= pos_y + 18 then
+            pos_y = mousePos.y
+            pos_x = mousePos.x
+        end
+    end
+    keyadd_y = 14
+
+    if gaybindys == 2 then
+    render.draw_rect_filled(pos_x, pos_y - 3, 150, 3, akcentlel)
+    elseif gaybindys == 3 then
+        gradient(pos_x, pos_y - 3, 75, 3,0, 72, 252, 255, 232, 52, 235, 255,true)
+        gradient(pos_x+75, pos_y - 3, 75, 3, 232, 52, 235, 255, 123, 255, 0, 255,true)
+    end
+
+    render.draw_rect(pos_x, pos_y - 3, 150, 3, color.new(25, 25, 25, 255))
+
+
+    if gaybindys == 3 then
+    zielone1, zielone2, zielone3 = 0, 119, 255
+    zielone4, zielone5, zielone6 = 47, 255, 0   
+    else
+    zielone1, zielone2, zielone3 = 255, 255, 255   
+    zielone4, zielone5, zielone6 = 255, 255, 255   
+    end
+
+    render.draw_rect_filled(pos_x, pos_y - 1, 150, 18, color.new(25, 25, 25, 255))
+    render.draw_text(smallfont, pos_x + 55, pos_y + 2, color.new(255, 255, 255), "keybinds")
+    count = 0
+    if (menu.get_key_bind_state("rage.double_tap_key")) then
+        alphadt = clamp(alphadt + 2, -100, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphadt))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphadt), "double tap")
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphadt), "[on]")          
+        keyadd_y = keyadd_y + 14
+    else
+        alphadt = clamp(alphadt - 2, 0, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphadt))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphadt), "double tap") 
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphadt), "[on]")         
+    end
+    if (menu.get_key_bind_state("rage.hide_shots_key")) then
+        alphahs = clamp(alphahs + 2, -100, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphahs))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphahs), "hide shots")
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphahs), "[on]")          
+        keyadd_y = keyadd_y + 14
+    else
+        alphahs = clamp( alphahs - 2, 0, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphahs))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphahs), "hide shots")   
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphahs), "[on]")       
+    end
+    if (menu.get_key_bind_state("anti_aim.fake_duck_key")) then
+        alphafd = clamp(alphafd + 2, -100, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphafd))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphafd), "fake duck") 
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphafd), "[on]")         
+        keyadd_y = keyadd_y + 14
+    else
+        alphafd = clamp(alphafd - 2, 0, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphafd))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphafd), "fake duck")  
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphafd), "[on]")        
+    end
+    if (menu.get_key_bind_state("misc.slow_walk_key")) then
+        alphasw = clamp(alphasw + 2, -100, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphasw))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphasw), "slow walk") 
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphasw), "[on]")         
+        keyadd_y = keyadd_y + 14
+    else
+        alphasw = clamp(alphasw - 2, 0, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphasw))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphasw), "slow walk")  
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphasw), "[on]")        
+    end
+    if (menu.get_key_bind_state("misc.automatic_peek_key")) then
+        alphaap = clamp(alphaap + 2, -100, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphaap))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphaap), "auto peek") 
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphaap), "[on]")         
+        keyadd_y = keyadd_y + 14
+    else
+        alphaap = clamp(alphaap - 2, 0, 255)
+        render.draw_rect_filled(pos_x, pos_y + keyadd_y + 3, 150, 14, color.new(35, 35, 35, alphaap))
+        render.draw_text(smallfont, pos_x +1, pos_y+1+keyadd_y, color.new(zielone1,zielone2,zielone3,alphaap), "auto peek")  
+        render.draw_text(smallfont, pos_x +130, pos_y+1+keyadd_y, color.new(zielone4, zielone5, zielone6,alphaap), "[on]")        
+    end
+end
+
+client.add_callback("on_paint", on_paint)
+
+
+
+local function eventlog()
+    for i = 1,#logs do
+        if logs[i] ~= nil then
+            local log = logs[i]
+            log[3] = log[3] + 4
+            local size = render.get_text_width(font, log[2]) + 10
+            if log[3] < size then
+                render.draw_rect_filled(-size + log[3], 0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 220))
+                render.draw_rect_filled(0 + log[3], 0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, -(size + 5) + log[3], 5 + (20 * (i - 1)), color.new(255, 255, 255, 255), log[2])
+            elseif log[3] < 600 + size then
+                render.draw_rect_filled(0, 0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 220))
+                render.draw_rect_filled(size, 0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, 5, 5 + (20 * (i - 1)), color.new(255, 255, 255, 255), log[2])
+            elseif log[3] < 600 + size * 2 then
+                local minus = log[3] - (600 + size)
+                render.draw_rect_filled(0 - minus, 0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 220))
+                render.draw_rect_filled(size - minus, 0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, 5 - minus, 5 + (20 * (i - 1)), color.new(255, 255, 255, 255), log[2])
+            else
+                table.remove(logs, i)
+            end
+        end
+    end
+end
+
+nigger_y = 870
+nigger_x = 750
+
+local function eventloggss()
+    for i = 1,#loggss do
+        if loggss[i] ~= nil then
+            local logg = loggss[i]
+            logg[3] = logg[3] + 2
+            local size = render.get_text_width(font, logg[2]) + 10
+            if logg[3] < size then
+                render.draw_rect_filled(-size + logg[3]+nigger_y, nigger_x+0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 150))
+                render.draw_rect_filled(0 + logg[3]+nigger_y,nigger_x+ 0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_rect_filled(0 + logg[3]+nigger_y,nigger_x+0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, -(size + 5) + nigger_y +logg[3], nigger_x+5 + (20 * (i - 1)), color.new(255, 255, 255, 255), logg[2])
+            elseif logg[3] < 1000 + size then
+                render.draw_rect_filled(0+nigger_y, nigger_x+0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 150))
+                render.draw_rect_filled(size+nigger_y,nigger_x+0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_rect_filled(nigger_y,nigger_x+0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, 5+nigger_y, nigger_x+5 + (20 * (i - 1)), color.new(255, 255, 255, 255), logg[2])
+            elseif logg[3] < 1000 + size * 1.3 then
+                local minus = logg[3] - (1000 + size)
+                render.draw_rect_filled(0 - minus+nigger_y,nigger_x+ 0 + (20 * (i - 1)), size, 20, color.new(0, 0, 0, 150))
+                render.draw_rect_filled(size - minus+nigger_y,nigger_x+ 0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_rect_filled(minus+nigger_y,nigger_x+0 + (20 * (i - 1)), 2, 20, akcentlel)
+                render.draw_text(font, nigger_y+5 - minus, nigger_x+5 +(20 * (i - 1)), color.new(255, 255, 255, 255), logg[2])
+            else
+                table.remove(loggss, i)
+            end
+        end
+    end
+end
+
+    
+
+
+    
+
+local active_tab = 1
+local widgetPos = vector.new(0, 0, 0)
+
+local function addTab(text, pos_x, pos_y, tab_number)
+    local mousePos = getMousePos()
+    local active = 0
+    
+    local text_size = render.get_text_width(indifont, text)
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 then
+        if mousePos.x >= pos_x and mousePos.x <= pos_x + text_size and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+            active_tab = tab_number
+            holdingTab = tab_number
+            if activeCombo ~= 0 then
+                activeCombo = 0
+            end
+        end
+    elseif not asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == tab_number then
+        holdingTab = 0
+    end
+
+    if tab_number == active_tab then
+        active = 2
+    elseif mousePos.x >= pos_x and mousePos.x <= pos_x + text_size and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+        active = 1
+    end
+
+    if active == 0 then
+        render.draw_text(indifont, pos_x, pos_y, color.new(191, 191, 191), text)
+    elseif active == 1 then
+        render.draw_text(indifont, pos_x, pos_y, color.new(255, 255, 255), text)
+    elseif active == 2 then
+        render.draw_text(indifont, pos_x, pos_y, akcentlel, text)
+    end
+
+    return active == 2
+end
+
+local function addChild(text, pos_x)
+
+    render.draw_circle_filled(pos_x, menuPos.y + 75, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(pos_x, menuPos.y + 450, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(pos_x + 345, menuPos.y + 75, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(pos_x + 345, menuPos.y + 450, 30, 6, color.new(25,25,25, 255))
+    render.draw_rect_filled(pos_x-6, menuPos.y + 75, 357, 375, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(pos_x, menuPos.y + 69, 345, 20, color.new(25, 25, 25, 255))
+
+    render.draw_rect_filled(pos_x, menuPos.y + 450, 345, 6, color.new(25, 25, 25, 255))
+
+    local text_size = render.get_text_width(font, text)
+
+    render.draw_text(font, pos_x + 5, menuPos.y + 68, color.new(191, 191, 191), text)
+    widgetPos = vector.new(pos_x + 10, menuPos.y + 85, 0)
+end
+
+local function addCheckbox(text, pos_y, i1, i2, i3)
+    local var
+    if i3 ~= 0 then
+        var = boolVars[i1][i2][i3]
+    elseif i2 ~= 0 then
+        var = boolVars[i1][i2]
+    else
+        var = boolVars[i1]
+    end
+
+    local mousePos = getMousePos()
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 then
+        if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 12 and mousePos.y >= pos_y and mousePos.y <= pos_y + 12 then
+            if i3 ~= 0 then
+                boolVars[i1][i2][i3] = not boolVars[i1][i2][i3]
+            elseif i2 ~= 0 then
+                boolVars[i1][i2] = not boolVars[i1][i2]
+            else
+                boolVars[i1] = not boolVars[i1]
+            end
+            holdingWidget = 1
+
+            if activeCombo ~= 0 then
+                activeCombo = 0
+            end
+        end
+    elseif not asyncKeyState(0x1) and not dragingMenu and holdingWidget ~= 0 and holdingTab == 0 then
+        holdingWidget = 0
+    end
+
+    if pos_y + 12 >= widgetPos.y + 375 then return end
+
+    if var == true then
+        render.draw_rect_filled(widgetPos.x, pos_y, 12, 12, akcentlel)
+    else
+        render.draw_rect_filled(widgetPos.x, pos_y, 12, 12, color.new(111, 111, 111))
+    end
+
+    render.draw_rect(widgetPos.x, pos_y, 12, 12, color.new(0, 0, 0, 255))
+
+    render.draw_text(font, widgetPos.x + 17, pos_y, color.new(255, 255, 255), text)
+end
+
+function Split(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
+split_string = Split(file.read( path ), "s")
+
+local function colorpicker(x,y,text,colorerer,redd,grin,blu,alfa)
+    local mousePos = getMousePos()
+    render.draw_text(font, x, y - 30, color.new(255,255,255), text)       
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and mousePos.x+1 >= x+1 and mousePos.x <= x+85 and mousePos.y >= y-40 and mousePos.y  <= y - 15 then 
+        enable_picker = true             
+    end
+    if ffi.C.GetAsyncKeyState(0x2) ~= 0 and mousePos.x+1 >= x+1 and mousePos.x <= x+85 and mousePos.y >= y-40  and mousePos.y <= y - 15 then 
+        enable_picker = false             
+    end
+    if fincl1 >= 255 then
+        fincl1 = 255
+    end
+    if fincl1 <= 0 then
+        fincl1 = 0
+    end
+    if fincl2 >= 255 then
+        fincl2 = 255
+    end
+    if fincl2 <= 0 then
+        fincl2 = 0
+    end
+    if fincl3 >= 255 then
+        fincl3 = 255
+    end
+    if fincl3 <= 0 then
+        fincl3 = 0
+    end
+    colorerer = color.new(fincl1,fincl2,fincl3,pos_x_xd) 
+    render.draw_rect_filled(x+70, y - 30, 15, 15, colorerer)
+    render.draw_rect(x+70, y - 30, 15, 15, color.new(5, 5, 5, 255))
+
+    if enable_picker == true then
+        render.draw_rect_filled(x-8, y-8, 300, 300, color.new(45, 45, 45, 255))
+        render.draw_rect_filled(x-4, y-4, 293, 293, color.new(60, 60, 60, 255))            
+        render.draw_rect_filled(x+267, y, 12, 255, color.new(60, 60, 60, 255))
+
+        render.draw_rect_filled(x+5, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+15, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+30, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+45, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+60, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+75, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+90, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+105, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+120, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+135, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+150, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+165, y+273, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+180, y+267, 10,6, color.new(15, 15, 15, 250))
+        render.draw_rect_filled(x+205, y+273, 10,6, color.new(15, 15, 15, 250))
+
+        gradient(x,y+267,255,12, 255,255,255,1, 255,255,255,190,true)
+        
+
+
+        gradient(x+267,y,12,42, 255, 0, 0, 255, 255, 255, 0, 255,false)
+        gradient(x+267,y+42,12,42, 255, 255, 0, 255, 0, 255, 0, 255,false)
+        gradient(x+267,y+84,12,42, 0, 255, 0, 255, 0, 255, 255, 255,false)
+        gradient(x+267,y+126,12,42, 0, 255, 0, 255, 0, 255, 255, 255,false)
+        gradient(x+267,y+126,12,42, 0, 255, 255, 255, 0, 0, 255, 255,false)
+        gradient(x+267,y+168,12,42, 0, 0, 255, 255, 255, 0, 255, 255,false)
+        gradient(x+267,y+210,12,43, 255, 0, 255, 255, 255, 0, 0, 255,false)
+
+
+    end
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and mousePos.x >= x and mousePos.x <= x+258 and mousePos.y >= y and mousePos.y <= y+258 then 
+        holding_circle = true
+    else
+        holding_circle = false
+    end
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and mousePos.x >= x and mousePos.x <= x+255 and mousePos.y >= y+266 and mousePos.y <= y+290 then 
+        holding_alpha = true            
+    else
+        holding_alpha = false            
+    end      
+    if ffi.C.GetAsyncKeyState(0x1) ~= 0 and mousePos.x >= x+267 and mousePos.x <= x+290 and mousePos.y >= y and mousePos.y <= y+265 then 
+        holding_color = true            
+    else
+        holding_color = false            
+    end    
+    if holding_color == true then
+        pos_y_xd = mousePos.y - y
+        if pos_y_xd >= 250 then
+            pos_y_xd = 250
+        end
+        if pos_y_xd <= 0 then
+            pos_y_xd = 0
+        end 
+    end
+    if enable_picker then
+        if pos_y_xd >= 0 and pos_y_xd < 42.5 then
+            fincl1 = pos_cy_xd
+            fincl2 = pos_cy_xd - pos_cx_xd + 4 * pos_y_xd
+            fincl3 = pos_cy_xd - pos_cx_xd 
+            gradient(x,y,255,255,255,255,255,255,255,4* pos_y_xd,0 ,235,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        elseif pos_y_xd >= 42.5 and pos_y_xd < 85 then
+            local jebackurwy = pos_y_xd - 42.5
+            fincl1 = pos_cy_xd - 4 * jebackurwy
+            fincl2 = pos_cy_xd - pos_cx_xd + 212
+            fincl3 = pos_cy_xd - pos_cx_xd 
+            gradient(x,y,255,255,255,255,255,255,255 - 4 * jebackurwy ,235,0,255,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        elseif pos_y_xd >= 85 and pos_y_xd < 127.5  then
+            local jebaccckurwy = pos_y_xd - 85
+            fincl1 = pos_cy_xd - pos_cx_xd
+            fincl2 = pos_cy_xd - pos_cx_xd + 212
+            fincl3 = pos_cy_xd - pos_cx_xd + 4 * jebaccckurwy
+            gradient(x,y,255,255,255,255,255,255, 0,235,4 * jebaccckurwy,255,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        elseif pos_y_xd >= 127.5 and pos_y_xd < 170 then
+            local jebaccckurwyyy = pos_y_xd - 127.5
+            fincl1 = pos_cy_xd - pos_cx_xd
+            fincl2 = pos_cy_xd - 4 * jebaccckurwyyy
+            fincl3 = pos_cy_xd - pos_cx_xd + 212
+            gradient(x,y,255,255,255,255,255, 255,  0, 255- 4 * jebaccckurwyyy,255,255,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        elseif pos_y_xd >= 170 and pos_y_xd < 212.5 then
+            local jebaccckurwyyyyyyy = pos_y_xd - 170
+            fincl1 = pos_cy_xd - pos_cx_xd + 4 * jebaccckurwyyyyyyy
+            fincl2 = pos_cy_xd - pos_cx_xd
+            fincl3 = pos_cy_xd - pos_cx_xd + 212
+            gradient(x,y,255,255,255,255,255,255,4 * jebaccckurwyyyyyyy,0,255,255,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        elseif pos_y_xd >= 212.5 and pos_y_xd < 255 then
+            local jebaccasddsaacckurwyyyyyyy = pos_y_xd - 212.5
+            fincl1 = pos_cy_xd - pos_cx_xd + 212 
+            fincl2 = pos_cy_xd - pos_cx_xd 
+            fincl3 = pos_cy_xd - 4 * jebaccasddsaacckurwyyyyyyy
+            gradient(x,y,255,255,255,255,255,255, 255,0,255-4 * jebaccasddsaacckurwyyyyyyy,255,true)
+            gradient(x,y,255,255,0,0,0,255,0,0,0,150,false)
+        end 
+        if holding_alpha == true then 
+            pos_x_xd = mousePos.x - x
+            if pos_x_xd >= 255 then
+                pos_x_xd = 255
+            end
+            if pos_x_xd <= 0 then
+                pos_x_xd = 0
+            end
+        end  
+        if holding_circle == true then
+            holding_color = false
+            holding_alpha = false
+            pos_cy_xd = mousePos.y - y
+            pos_cx_xd = mousePos.x - x
+            if pos_cy_xd >= 255 then
+                pos_cy_xd = 255
+            end
+            if pos_cy_xd <= 0 then
+                pos_cy_xd = 0
+            end
+            if pos_cx_xd >= 255 then
+                pos_cx_xd = 255
+            end
+            if pos_cx_xd <= 0 then
+                pos_cx_xd = 0
+            end
+        end           
+        if enable_picker then
+            render.draw_circle_filled(x+pos_cx_xd, y+pos_cy_xd, 30, 5, color.new(255,255,255)) 
+            render.draw_rect_filled(x+267, y+pos_y_xd, 12,3, color.new(129, 129, 129, 255)) 
+            render.draw_rect_filled(x+pos_x_xd, y+267, 3,12, color.new(129, 129, 129, 255))
+        end   
+        redd = fincl1
+        grin = fincl2
+        blu = fincl3
+        alfa = pos_x_xd
+        color.new(fincl1,fincl2,fincl3,pos_x_xd) 
+        return enable_picker,colorerer,fincl1,fincl2,fincl3,pos_x_xd
+    end
+end
+
+local function addSlider(text, pos_y, min, max, i1, i2, i3)
+    local var
+    if i3 ~= 0 then
+        var = intVars[i1][i2][i3]
+    elseif i2 ~= 0 then
+        var = intVars[i1][i2]
+    else
+        var = intVars[i1]
+    end
+
+    local mousePos = getMousePos()
+
+    local modifier = 120 / (max - min)
+
+    local i = i1 + 10
+    if i3 ~= 0 then
+        i = i + i2 + i3 + 20
+    elseif i2 ~= 0 then
+        i = i + i2 + 30
+    end
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 then
+        if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 and mousePos.y >= pos_y + 12 and mousePos.y <= pos_y + 17 then
+            holdingWidget = 2 + i
+            if activeCombo ~= 0 then
+                activeCombo = 0
+            end
+        end
+    elseif not asyncKeyState(0x1) and not dragingMenu and holdingWidget ~= 0 and holdingTab == 0 then
+        holdingWidget = 0
+    end
+
+    if holdingWidget == 2 + i then
+        local final_value = min + toint((mousePos.x - widgetPos.x) / modifier)
+        if final_value > max then
+            final_value = max
+        end
+        if final_value < min then
+            final_value = min
+        end
+        if i3 ~= 0 then
+            intVars[i1][i2][i3] = final_value
+        elseif i2 ~= 0 then
+            intVars[i1][i2] = final_value
+        else
+            intVars[i1] = final_value
+        end
+    end
+
+    render.draw_text(font, widgetPos.x, pos_y -3, color.new(255, 255, 255), text)
+    render.draw_rect_filled(widgetPos.x, pos_y + 13, 120, 5, color.new(111, 111, 111))
+    render.draw_rect_filled(widgetPos.x, pos_y + 13, (var - min) * modifier, 5, akcentlel)
+    render.draw_rect_filled(widgetPos.x-2, pos_y + 13, (var - min) * modifier+5, 5, akcentlel)
+    render.draw_circle_filled(widgetPos.x +  (var - min) * modifier, pos_y + 13, 30, 2, akcentlel)
+    render.draw_circle_filled(widgetPos.x +  (var - min) * modifier, pos_y + 19, 30, 2, akcentlel)
+    render.draw_text(font, widgetPos.x + 125, pos_y + 9, color.new(255, 255, 255), tostring(var))
+end
+
+local function addCombo(text, pos_y, names, options, i1, i2, i3)
+    local var
+    if i1 == 99 and i2 == 99 then
+        var = weaponSelect
+    elseif i1 == 99 and i2 == 0 then
+        var = movementSelect
+    elseif i3 ~= 0 then
+        var = intVars[i1][i2][i3]
+    elseif i2 ~= 0 then
+        var = intVars[i1][i2]
+    else
+        var = intVars[i1]
+    end
+
+    local mousePos = getMousePos()
+
+    local i = i1 + 10
+    if i3 ~= 0 then
+        i = i + i2 + i3 + 20
+    elseif i2 ~= 0 then
+        i = i + i2 + 30
+    end
+
+    if asyncKeyState(0x1) and activeCombo == i then
+        local breakCombo = 0
+        for j = 1,options do
+            if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 80 and mousePos.y >= pos_y + ((20 * j)) and mousePos.y <= pos_y + 20 + (20 * j) then
+                if i1 == 99 and i2 == 99 then
+                    weaponSelect = j
+                elseif i1 == 99 and i2 == 0 then
+                    movementSelect = j
+                elseif i3 ~= 0 then
+                    intVars[i1][i2][i3] = j
+                elseif i2 ~= 0 then
+                    intVars[i1][i2] = j
+                else
+                    intVars[i1] = j
+                end
+            else
+                breakCombo = breakCombo + 1
+            end
+        end
+
+        if breakCombo == options then
+            activeCombo = 0
+        end
+    end
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 and activeCombo ~= i then
+        if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 80 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+            activeCombo = i
+        end
+    end
+
+    
+    render.draw_circle_filled(widgetPos.x, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x+80, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x+80, pos_y+20, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y+20, 30, 3, akcentlel)
+    render.draw_rect_filled(widgetPos.x+1, pos_y-3, 79, 26, akcentlel)
+    render.draw_rect_filled(widgetPos.x-3, pos_y+1, 86, 17, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y, 80, 20, color.new(51, 51, 51))
+    local text_size = render.get_text_width(font, text)
+    render.draw_text(font, widgetPos.x + 40 - (text_size / 2), pos_y + 3, color.new(255, 255, 255), text)
+    local add_y  = 20
+    if activeCombo == i then
+        local nextY = 0
+        for j = 1,options do
+            render.draw_circle_filled(widgetPos.x+80, pos_y+20+add_y, 30, 3, akcentlel)
+            render.draw_circle_filled(widgetPos.x, pos_y+20+add_y, 30, 3, akcentlel)
+            render.draw_rect_filled(widgetPos.x-3, pos_y+1+add_y, 86, 17, akcentlel)
+            render.draw_rect_filled(widgetPos.x+1, pos_y-3+add_y, 79, 26, akcentlel)
+            render.draw_rect_filled(widgetPos.x, pos_y + add_y, 80, 20, color.new(51, 51, 51))
+            local textColor = color.new(191, 191, 191)
+            if i1 == 99 and i2 == 99 then
+                if weaponSelect == j then
+                    textColor = color.new(255, 255, 255)
+                end
+            elseif i1 == 99 and i2 == 0 then
+                if movementSelect == j then
+                    textColor = color.new(255, 255, 255)
+                end
+            elseif i3 ~= 0 then
+                if intVars[i1][i2][i3] == j then
+                    textColor = color.new(255, 255, 255)
+                end
+            elseif i2 ~= 0 then
+                if intVars[i1][i2] == j then
+                    textColor = color.new(255, 255, 255)
+                end
+            else
+                if intVars[i1] == j then
+                    textColor = color.new(255, 255, 255)
+                end
+            end
+            local txtSize = render.get_text_width(font, names[j])
+            render.draw_text(font, widgetPos.x + 40 - (txtSize / 2), pos_y + add_y + 3, textColor, names[j])
+            add_y = add_y + 20
+        end
+    end
+
+    render.draw_rect(widgetPos.x, pos_y, 80, add_y, color.new(0, 0, 0))
+    return add_y
+end
+
+local function addMultiCombo(text, pos_y, names, options, i1, i2)
+    local var
+    if i2 ~= 0 then
+        var = boolVars[i1][i2]
+    else
+        var = boolVars[i1]
+    end
+
+    local mousePos = getMousePos()
+
+    local i = i1 + 10
+    if i2 ~= 0 then
+        i = i + i2 + 20
+    end
+
+    if not asyncKeyState(0x1) then
+        holdingMulti = false
+    end
+
+    if asyncKeyState(0x1) and activeMultiCombo == i then
+        local breakCombo = 0
+        for j = 1,options do
+            if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 80 and mousePos.y >= pos_y + ((20 * j)) and mousePos.y <= pos_y + 20 + (20 * j) and not holdingMulti then
+                if i2 ~= 0 then
+                    boolVars[i1][i2][j] = not boolVars[i1][i2][j]
+                    holdingMulti = true
+                else
+                    boolVars[i1][j] = not boolVars[i1][j]
+                    holdingMulti = true
+                end
+            elseif not holdingMulti then
+                breakCombo = breakCombo + 1
+            end
+        end
+
+        if breakCombo == options then
+            activeMultiCombo = 0
+        end
+    end
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 and activeMultiCombo ~= i then
+        if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 80 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+            activeMultiCombo = i
+        end
+    end
+
+    render.draw_circle_filled(widgetPos.x, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x+80, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x+80, pos_y+20, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y+20, 30, 3, akcentlel)
+    render.draw_rect_filled(widgetPos.x+1, pos_y-3, 79, 26, akcentlel)
+    render.draw_rect_filled(widgetPos.x-3, pos_y+1, 86, 17, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y, 80, 20, color.new(51, 51, 51))
+    local text_size = render.get_text_width(font, text)
+    render.draw_text(font, widgetPos.x + 40 - (text_size / 2), pos_y + 3, color.new(255, 255, 255), text)
+    local add_y  = 20
+    if activeMultiCombo == i then
+        for j = 1,options do
+            render.draw_circle_filled(widgetPos.x+80, pos_y+20+add_y, 30, 3, akcentlel)
+            render.draw_circle_filled(widgetPos.x, pos_y+20+add_y, 30, 3, akcentlel)
+            render.draw_rect_filled(widgetPos.x-3, pos_y+1+add_y, 86, 17, akcentlel)
+            render.draw_rect_filled(widgetPos.x+1, pos_y-3+add_y, 79, 26, akcentlel)
+            render.draw_rect_filled(widgetPos.x, pos_y + add_y, 80, 20, color.new(51, 51, 51))
+            local textColor = color.new(191, 191, 191)
+            if i2 ~= 0 then
+                if boolVars[i1][i2][j] == true then
+                    textColor = color.new(255, 255, 255)
+                end
+            else
+                if boolVars[i1][j] == true then
+                    textColor = color.new(255, 255, 255)
+                end
+            end
+            local txtSize = render.get_text_width(font, names[j])
+            render.draw_text(font, widgetPos.x + 40 - (txtSize / 2), pos_y + add_y + 3, textColor, names[j])
+            add_y = add_y + 20
+        end
+    end
+
+    render.draw_rect(widgetPos.x, pos_y, 80, add_y, color.new(0, 0, 0))
+    return add_y
+end
+function table_to_string(tbl)
+    local result = "{"
+    for k, v in pairs(tbl) do
+        if type(v) == "table" then          
+            result = result..table_to_string(v)
+        else
+            result = result..tostring(v)
+        end
+        result = result..","
+    end
+
+    if result ~= "" then
+        result = result:sub(1, result:len()-1)
+    end
+    return result.."}"
+end
+
+local function saveCfg(i)
+    if savingCfg == true then return end
+    file.write( appdata.."/Legendware/color.txt", tostring(fincl1).."s"..tostring(fincl2).."s"..tostring(fincl3).."s"..tostring(pos_x_xd).."s"..tostring(hold).."s"..tostring(toggle) )
+    savingCfg = true
+    local result = table_to_string(intVars)..", \n"..table_to_string(boolVars)
+    if i == 1 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot1.txt", 0xC0000000, 0x00000003, 0, 5, 0x80, nil))
+        ffi.C.WriteFile(pfile, ffi.cast("char*", result), string.len(result), nil, 0)
+        ffi.C.CloseHandle(pfile)
+    elseif i == 2 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot2.txt", 0xC0000000, 0x00000003, 0, 5, 0x80, nil))
+        ffi.C.WriteFile(pfile, ffi.cast("char*", result), string.len(result), nil, 0)
+        ffi.C.CloseHandle(pfile)
+    elseif i == 3 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot3.txt", 0xC0000000, 0x00000003, 0, 5, 0x80, nil))
+        ffi.C.WriteFile(pfile, ffi.cast("char*", result), string.len(result), nil, 0)
+        ffi.C.CloseHandle(pfile)
+   elseif i == 4 then        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot4.txt", 0xC0000000, 0x00000003, 0, 5, 0x80, nil))
+        ffi.C.WriteFile(pfile, ffi.cast("char*", result), string.len(result), nil, 0)
+        ffi.C.CloseHandle(pfile)
+    else
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot5.txt", 0xC0000000, 0x00000003, 0, 5, 0x80, nil))
+        ffi.C.WriteFile(pfile, ffi.cast("char*", result), string.len(result), nil, 0)
+        ffi.C.CloseHandle(pfile)
+    end
+
+    savingCfg = false
+    
+    table.insert(logs, {2, "Saved config successfully!", 0})
+    coloredPrint(akcentlel, "[LegendSide] ")
+    coloredPrint(color.new(255, 255, 255), "Saved config successfully!\n")
+end
+local function loadCfg(i)
+    local fileResult = ""
+    fincl1 = tonumber(split_string[1])
+    fincl2 = tonumber(split_string[2])
+    fincl3 = tonumber(split_string[3])
+    pos_x_xd = tonumber(split_string[4])
+    akcentlel = color.new(fincl1,fincl2,fincl3,pos_x_xd)
+    if i == 1 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot1.txt", 0xC0000000, 0x3, 0, 3, 0x80, nil))
+        local size = ffi.C.GetFileSize(pfile, nil)
+        local buff = ffi.new("char[" ..(size + 1).. "]")
+        ffi.C.ReadFile(pfile, buff, size, nil, 0)
+        ffi.C.CloseHandle(pfile)
+        fileResult = ffi.string(buff)
+    elseif i == 2 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot2.txt", 0xC0000000, 0x3, 0, 3, 0x80, nil))
+        local size = ffi.C.GetFileSize(pfile, nil)
+        local buff = ffi.new("char[" ..(size + 1).. "]")
+        ffi.C.ReadFile(pfile, buff, size, nil, 0)
+        ffi.C.CloseHandle(pfile)
+        fileResult = ffi.string(buff)
+    elseif i == 3 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot3.txt", 0xC0000000, 0x3, 0, 3, 0x80, nil))
+        local size = ffi.C.GetFileSize(pfile, nil)
+        local buff = ffi.new("char[" ..(size + 1).. "]")
+        ffi.C.ReadFile(pfile, buff, size, nil, 0)
+        ffi.C.CloseHandle(pfile)
+        fileResult = ffi.string(buff)
+    elseif i == 4 then
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot4.txt", 0xC0000000, 0x3, 0, 3, 0x80, nil))
+        local size = ffi.C.GetFileSize(pfile, nil)
+        local buff = ffi.new("char[" ..(size + 1).. "]")
+        ffi.C.ReadFile(pfile, buff, size, nil, 0)
+        ffi.C.CloseHandle(pfile)
+        fileResult = ffi.string(buff)
+    else
+        local pfile = ffi.cast("void*", ffi.C.CreateFileA("Legendside\\slot5.txt", 0xC0000000, 0x3, 0, 3, 0x80, nil))
+        local size = ffi.C.GetFileSize(pfile, nil)
+        local buff = ffi.new("char[" ..(size + 1).. "]")
+        ffi.C.ReadFile(pfile, buff, size, nil, 0)
+        ffi.C.CloseHandle(pfile)
+        fileResult = ffi.string(buff)
+    end
+
+    fileResult = tostring(fileResult)
+
+    if fileResult == nil or fileResult == "" then
+        table.insert(logs, {2, "Config is inccorect or empty!", 0})
+        coloredPrint(akcentlel, "[LegendSide] ")
+        coloredPrint(color.new(255, 255, 255), "Config is inccorect or empty!\n")
+        return
+    end
+
+    local vars = loadstring("return {" .. fileResult .. "}")()
+    local ints = vars[1]
+    local bools = vars[2]
+
+    if ints == nil or bools == nil then
+        table.insert(logs, {2, "Config is inccorect or empty!", 0})
+        coloredPrint(akcentlel, "[LegendSide] ")
+        coloredPrint(color.new(255, 255, 255), "Config is inccorect or empty!\n")
+        return
+    end 
+
+    for i = 1,50 do
+        if ints[i] ~= nil then
+            if type(ints[i]) ~= "table" then
+                intVars[i] = ints[i]
+            else
+                for j = 1,50 do
+                    if ints[i][j] ~= nil then
+                        if type(ints[i][j]) ~= "table" then
+                            intVars[i][j] = ints[i][j]
+                        else
+                            for h = 1,50 do
+                                if ints[i][j][h] ~= nil then
+                                    intVars[i][j][h] = ints[i][j][h]
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if bools[i] ~= nil then
+            if type(bools[i]) ~= "table" then
+                boolVars[i] = bools[i]
+            else
+                for j = 1,50 do
+                    if bools[i][j] ~= nil then
+                        if type(bools[i][j]) ~= "table" then
+                            boolVars[i][j] = bools[i][j]
+                        else
+                            for h = 1,50 do
+                                if bools[i][j][h] ~= nil then
+                                    boolVars[i][j][h] = bools[i][j][h]
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    table.insert(logs, {2, "Loaded config successfully!", 0})
+    coloredPrint(akcentlel, "[LegendSide] ")
+    coloredPrint(color.new(255, 255, 255), "Loaded config successfully!\n")
+end
+local function addButonSave(pos_y)
+    local mousePos = getMousePos()
+    if asyncKeyState(0x1) then
+        if not holdingLoad and not holdingSave then
+            if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+                holdingSave = true
+            end
+        end
+    else
+        if holdingSave == true then
+            holdingSave = false
+            saveCfg(intVars[12])
+        end
+    end
+
+    local textColor = color.new(191, 191, 191)
+    if (mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20) or holdingSave then
+        textColor = color.new(255, 255, 255)
+    end
+
+    local text_size = render.get_text_width(font, "Save Config")
+    render.draw_rect_filled(widgetPos.x  - 3, pos_y , 126, 20, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y - 3, 120, 26, akcentlel)
+    render.draw_circle_filled(widgetPos.x  + 120, pos_y + 20, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x  + 120, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y + 20, 30, 3, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y, 120, 20, color.new(51, 51, 51))
+    render.draw_rect(widgetPos.x, pos_y, 120, 20, color.new(0, 0, 0))
+    render.draw_text(font, widgetPos.x + 60 - (text_size / 2), pos_y + 4, textColor, "Save Config")
+end
+local function addButonLoad(pos_y)
+    local mousePos = getMousePos()
+    if asyncKeyState(0x1) then
+        if not holdingLoad and not holdingSave then
+            if mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+                holdingLoad = true
+            end
+        end
+    else
+        if holdingLoad == true then
+            holdingLoad = false
+            loadCfg(intVars[12])
+        end
+    end
+
+    local textColor = color.new(191, 191, 191)
+    if (mousePos.x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 and mousePos.y >= pos_y and mousePos.y <= pos_y + 20) or holdingLoad then
+        textColor = color.new(255, 255, 255)
+    end
+
+    local text_size = render.get_text_width(font, "Load Config")
+    render.draw_rect_filled(widgetPos.x  - 3, pos_y , 126, 20, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y - 3, 120, 26, akcentlel)
+    render.draw_circle_filled(widgetPos.x  + 120, pos_y + 20, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x  + 120, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x, pos_y + 20, 30, 3, akcentlel)
+    render.draw_rect_filled(widgetPos.x, pos_y, 120, 20, color.new(51, 51, 51))
+    render.draw_rect(widgetPos.x, pos_y, 120, 20, color.new(0, 0, 0))
+    render.draw_text(font, widgetPos.x + 60 - (text_size / 2), pos_y + 4, textColor, "Load Config")
+end
+
+local curpos = vector.new()
+function setmovement(xz,yz,cmd)
+    local local_player = entitylist.get_local_player()
+    local current_pos = local_player:get_origin()
+    local yaw = engine.get_view_angles().y
+
+    local vector_forward = { 
+        x = current_pos.x - xz,
+        y = current_pos.y - yz,
+    }
+     
+    local velocity = {
+        x = -(vector_forward.x * math.cos(yaw / 180 * math.pi) + vector_forward.y * math.sin(yaw / 180 * math.pi)),
+        y = vector_forward.y * math.cos(yaw / 180 * math.pi) - vector_forward.x * math.sin(yaw / 180 * math.pi),
+    }
+    cmd.forwardmove = velocity.x * 15
+    cmd.sidemove = velocity.y * 15
+end;
+
+client.add_callback( "create_move", function(cmd)
+    local localplayer = entitylist.get_local_player();
+    local forw = bit.band(cmd.buttons, 8) == 8;
+    local back = bit.band(cmd.buttons, 16) == 16;
+    local righ = bit.band(cmd.buttons, 512) == 512;
+    local left = bit.band(cmd.buttons, 1024) == 1024;
+    local apeek = menu.get_key_bind_state( "misc.automatic_peek_key" );
+    local originalpos = localplayer:get_origin();
+    local OnGround = bit.band(localplayer: get_prop_int("CBasePlayer","m_hGroundEntity"), 1);
+
+    if OnGround == 1 or bit.band(cmd.buttons, buttons.in_jump) == buttons.in_jump then -- air check
+        air = true
+    else
+        air = false
+    end
+    if apeek == false then
+        curpos = localplayer:get_origin();
+    end
+    if boolVars[31] then
+        if apeek == false then
+            menu.set_bool( "misc.fast_stop", true );
+        else
+            if forw == false and back == false and left == false and righ == false and math.floor(curpos.x) ~= math.floor(originalpos.x) and math.floor(curpos.y) ~= math.floor(originalpos.y) and air == false then
+                menu.set_bool( "misc.fast_stop", false );
+                setmovement(curpos.x,curpos.y, cmd);
+            else
+                menu.set_bool( "misc.fast_stop", true );
+            end
+        end
+    end
+end)
+
+local function addButonDiscord(pos_y, pos_x)
+    local mousePos = getMousePos()
+    if asyncKeyState(0x1) then
+        if mousePos.x - pos_x >= widgetPos.x and mousePos.x <= widgetPos.x + 120 + pos_x and mousePos.y >= pos_y and mousePos.y <= pos_y + 20 then
+            os.execute("start https://discord.gg/cZygMGC86q")
+        end
+    end
+
+    local textColor = color.new(191, 191, 191)
+    if (mousePos.x - pos_x>= widgetPos.x and mousePos.x <= widgetPos.x +120 + pos_x and mousePos.y >= pos_y and mousePos.y <= pos_y + 20) or holdingLoad then
+        textColor = color.new(255, 255, 255)
+    end
+
+    local text_size = render.get_text_width(font, "Join discord")
+
+    render.draw_rect_filled(widgetPos.x + pos_x - 3, pos_y , 126, 20, akcentlel)
+    render.draw_rect_filled(widgetPos.x + pos_x, pos_y - 3, 120, 26, akcentlel)
+    render.draw_circle_filled(widgetPos.x + pos_x + 120, pos_y + 20, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x + pos_x + 120, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x + pos_x, pos_y, 30, 3, akcentlel)
+    render.draw_circle_filled(widgetPos.x + pos_x, pos_y + 20, 30, 3, akcentlel)
+
+    render.draw_rect_filled(widgetPos.x + pos_x, pos_y, 120, 20, color.new(51, 51, 51))
+    render.draw_rect(widgetPos.x + pos_x, pos_y, 120, 20, color.new(0, 0, 0))
+    render.draw_text(font, widgetPos.x + 60 + pos_x - (text_size / 2), pos_y + 4, textColor, "Join discord")
+end
+local lastfps1 = 0
+local lastfps2 = 0
+local lastfps3 = 0
+local inter = 0
+local function drawMenu()
+    if loaded == false then return end
+    if asyncKeyState(0x24) and not holdingMenuKey then
+        menuOpen = not menuOpen
+        holdingMenuKey = true
+    elseif not asyncKeyState(0x24) and holdingMenuKey then
+        holdingMenuKey = false
+    end
+
+    if not menuOpen then return end
+    local mousePos = getMousePos()
+
+    if dragingMenu then
+        menuPos.x = mousePos.x - menuDiff.x
+        menuPos.y = mousePos.y - menuDiff.y
+    end
+
+    render.draw_rect_filled(menuPos.x + 11, menuPos.y + 59, 729, 447, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(menuPos.x + 4, menuPos.y + 65, 742, 435, color.new(25, 25, 25, 255))
+    
+    render.draw_circle_filled(menuPos.x + 10,  menuPos.y + 500, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 740,  menuPos.y + 500, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 740,  menuPos.y + 65, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 10,  menuPos.y + 65, 30, 6, color.new(25,25,25, 255))
+
+    render.draw_rect_filled(menuPos.x + 10, menuPos.y + 65, 730, 435, color.new(10, 10, 10, 255))
+
+    render.draw_circle_filled(menuPos.x + 20,  menuPos.y + 466, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 20,  menuPos.y + 490, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 365,  menuPos.y + 466, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 365,  menuPos.y + 490, 30, 6, color.new(25,25,25, 255))
+    render.draw_rect_filled(menuPos.x + 22, menuPos.y + 460, 343, 36, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(menuPos.x + 14, menuPos.y + 466, 357, 24, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(menuPos.x + 20, menuPos.y + 466, 345, 24, color.new(25, 25, 25, 255))
+
+    render.draw_circle_filled(menuPos.x + 385,  menuPos.y + 466, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 385,  menuPos.y + 490, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 730,  menuPos.y + 466, 30, 6, color.new(25,25,25, 255))
+    render.draw_circle_filled(menuPos.x + 730,  menuPos.y + 490, 30, 6, color.new(25,25,25, 255))
+    render.draw_rect_filled(menuPos.x + 387, menuPos.y + 460, 343, 36, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(menuPos.x + 379, menuPos.y + 466, 357, 24, color.new(25, 25, 25, 255))
+    render.draw_rect_filled(menuPos.x + 485, menuPos.y + 466, 245, 24, color.new(25, 25, 25, 255))
+    local text_size1 = render.get_text_width(indifont2, "Legend")
+    local text_size2 = render.get_text_width(indifont2, "Side")
+    local text_size = text_size1 + text_size2
+    render.draw_text(indifont2, menuPos.x + 423 - text_size / 2, menuPos.y + 477, color.new(255, 255, 255), "Legend")
+    render.draw_text(indifont2, menuPos.x + 423 - text_size / 2 + text_size1, menuPos.y + 477, akcentlel, "Side")
+    render.draw_text(indifont2, menuPos.x + 423 - text_size / 2 + text_size1 + text_size2, menuPos.y + 477, color.new(255, 255, 255), " for legendware.pw")
+
+    render.draw_text(indifont2, menuPos.x + 390, menuPos.y + 462, color.new(255, 255, 255), username)
+    niguer = render.get_text_width(indifont2,username)
+    render.draw_text(indifont2, menuPos.x + 390+niguer+6, menuPos.y + 462, akcentlel, version)
+
+    render.draw_rect_filled(menuPos.x + 30, menuPos.y + 64, 680, 5, akcentlel)
+    render.draw_circle_filled(menuPos.x + 30, menuPos.y + 67, 30, 3, akcentlel)
+    render.draw_circle_filled(menuPos.x + 710, menuPos.y + 67, 30, 3, akcentlel)
+    local tab_1 = render.get_text_width(indifont, "Ragebot")
+    local tab_2 = render.get_text_width(indifont, "Anti-Aim")
+    local tab_3 = render.get_text_width(indifont, "Visuals")
+    local tab_4 = render.get_text_width(indifont, "Misc")
+    local tab_5 = render.get_text_width(indifont, "Configs")
+    local all_tab_size = tab_1 + tab_2 + tab_3 + tab_4 + tab_5
+    local tab_space = (710 - all_tab_size) / 5
+    addmilion = 0
+    kurwa_add = 0
+    if addTab("Ragebot", menuPos.x + 20, menuPos.y + 460, 1) then
+        addChild("General", menuPos.x + 20)
+        local add_y = addCombo("Resolver", widgetPos.y, {"None", "Anti-delta"}, 2, 5, 0, 0)
+        addSlider("Auto hitchance", widgetPos.y + 10 + add_y, 0, 100, 8, 5, 0)
+        addCheckbox("Override no scope hitchance", widgetPos.y + 32 + add_y, 3, 0, 0)
+        addSlider("Auto No scope hitchance", widgetPos.y + 48 + add_y, 0, 100, 8, 2, 0)     
+        addCheckbox("Extend backtrack", widgetPos.y + 70 + add_y, 4, 0, 0)
+        if boolVars[4] then
+            addmilion = 30
+            addCheckbox("Extreme backtrack", widgetPos.y + 85+ add_y, 24, 0, 0)
+            addCheckbox("NASA backtrack", widgetPos.y + 100+ add_y, 25, 0, 0)
+        end
+        addCheckbox("Disable clock correction", widgetPos.y + 85 + add_y+addmilion, 5, 0, 0)
+        local dodajey = 0
+        if boolVars[5] == true then
+            dodajey = 30
+            addCheckbox("Disable server tick", widgetPos.y + 100 + add_y+addmilion, 15, 0, 0)
+            addCheckbox("Disable clock drift", widgetPos.y + 115 + add_y+addmilion, 16, 0, 0)
+        end
+        addCheckbox("Ideal tick", widgetPos.y + 100 + add_y+dodajey+addmilion, 13, 0, 0)
+        addCheckbox("Jump scout", widgetPos.y + 115 + add_y+dodajey+addmilion, 14, 0, 0)
+        if boolVars[14] == true then
+            kurwa_add = 40
+            addSlider("Jumpscout HC", widgetPos.y + 130 + add_y+dodajey+addmilion, 0, 100, 8, 6, 0)
+            addSlider("Normal HC", widgetPos.y + 155 + add_y+dodajey+addmilion, 0, 100, 8, 3, 0)
+        end
+        add_y = add_y + addCombo("Weapon", widgetPos.y + 140 + add_y+dodajey+kurwa_add+addmilion, {"Auto", "Scout", "Awp", "Revolver", "Deagle"}, 5, 99, 99, 0)
+        add_y = add_y + addMultiCombo("Conditions", widgetPos.y + 150 + add_y+dodajey+kurwa_add+addmilion, {"Max misses", "Baim hp x"}, 2, 11, weaponSelect)
+        if boolVars[11][weaponSelect][1] then
+            addSlider("Max Misses", widgetPos.y + 155 + add_y+kurwa_add+dodajey+addmilion, 1, 10, 11, weaponSelect, 1)
+            add_y = add_y + 25
+        end
+        if boolVars[11][weaponSelect][2] then
+            addSlider("Baim under hp", widgetPos.y + 155 + add_y+kurwa_add+dodajey+addmilion, 1, 100, 11, weaponSelect, 2)
+            add_y = add_y + 25
+        end
+        addCheckbox("Ideal revolver", widgetPos.y + 155 + add_y+kurwa_add+dodajey+addmilion, 19, 0, 0)
+        addCheckbox("Ideal scout", widgetPos.y + 175 + add_y+kurwa_add+dodajey+addmilion, 47, 0, 0)
+        addChild("Other", menuPos.x + 385)
+        addCheckbox("Override resolver", widgetPos.y+5, 45, 0, 0) 
+        addButonDiscord(widgetPos.y + 385, menuPos.x - widgetPos.x + 590)
+    end
+    if addTab("Anti-Aim", menuPos.x - 40 + tab_1 + tab_space, menuPos.y + 460, 2) then
+        addChild("General", menuPos.x + 20)
+        addCheckbox("Low delta on slowwalk", widgetPos.y, 15, 0, 0)
+        addCheckbox("Pitch 0 on land", widgetPos.y + 20, 2, 0, 0)
+        legitact = addKeybind(widgetPos.x + 5, widgetPos.y + 40,"Legit AA",legitact)  
+        addSlider("Legit aa range", widgetPos.y + 70, 1, 60, 1, 0, 0)
+        addSlider("Slow walk speed", widgetPos.y + 95, 1, 120, 2, 0, 0)  
+        add_y = addCombo("Movement", widgetPos.y +120, {"Stand", "SlowWalk", "Run", "Air", "Crouch"}, 5, 99, 0, 0)
+        add_y = add_y + addCombo("Fake modifier", widgetPos.y + 130 + add_y, {"Normal", "Jittery", "Break", "Anti Bruteforce"}, 4, 3, movementSelect, 1)    
+        add_y = add_y + addCombo("Real modifier", widgetPos.y + 140 + add_y, {"Normal", "Ideal yaw", "match fake"}, 3, 3, movementSelect, 2)   
+        addCheckbox("override presets", widgetPos.y + 150 + add_y, 16, 0, 0)
+        addCheckbox("Leg Breaker", widgetPos.y  + 165 + add_y, 1, 0, 0)
+        addCheckbox("External antibrute", widgetPos.y  + 180 + add_y, 37, 0, 0)
+        addCheckbox("Anims", widgetPos.y  + 195 + add_y, 38, 0, 0)
+
+        addChild("Other", menuPos.x + 385)
+        local add_y = addCombo("Fakelag", widgetPos.y, {"Randomized", "Fluctuate", "Adaptive"}, 3, 4, 1, 0)
+        addSlider("Min lag", widgetPos.y + 5 + add_y, 1, 16, 4, 2, 0)
+        addSlider("Max lag", widgetPos.y + 25 + add_y, 1, 16, 4, 3, 0)
+        add_y = add_y + addMultiCombo("At target when", widgetPos.y + 50 + add_y, {"Stand", "SlowWak", "Run", "Air", "Crouch"}, 5, 28, 0, 0)
+        addCombo("Presets", widgetPos.y + 60 + add_y, {"None", "Tank AA", "Legend Yaw",}, 3, 15, 0, 0) 
+        addButonDiscord(widgetPos.y + 385, menuPos.x - widgetPos.x + 590)
+    end
+    if addTab("Visuals", menuPos.x - 105 + tab_1 + tab_space + tab_2 + tab_space, menuPos.y + 460, 3) then
+        addChild("General", menuPos.x + 20)
+        local add_y = addCombo("Watermark", widgetPos.y , {"None", "Static", "Gradient"}, 3, 14, 0, 0) 
+        addCheckbox("Hitlogs under crosshair", widgetPos.y+10 + add_y, 17, 0, 0)  
+        add_y = add_y + addCombo("Keybinds list", widgetPos.y + 30 + add_y, {"None", "Static", "Gradient"}, 3, 13, 0, 0) 
+        addCheckbox("damage indicator", widgetPos.y+40 + add_y, 23, 0, 0) 
+        addCheckbox("Holo panel", widgetPos.y+55 + add_y, 26, 0, 0) 
+        add_y = add_y + addCombo("Indicators", widgetPos.y + 75 + add_y, {"None", "Ideal yaw", "Killaura", "Acatel"}, 4, 7, 0, 0) 
+        addCheckbox("Knife left hand", widgetPos.y+85 + add_y, 46, 0, 0) 
+        addCheckbox("Viewmodel in scope", widgetPos.y+100 + add_y, 48, 0, 0) 
+        addCombo("Spectator list", widgetPos.y + 120 + add_y, {"None", "Static", "Gradient"}, 3, 16, 0, 0) 
+        addChild("Menu", menuPos.x + 385)
+        colorpiker = colorpicker(widgetPos.x, widgetPos.y + 35,"Menu accent",colorpiker,reddd,grinn,bluu,alfaa)         
+        if enable_picker then
+            if fincl1 >= 255 then
+                fincl1 = 255
+            end
+            if fincl1 <= 0 then
+                fincl1 = 0
+            end
+            if fincl2 >= 255 then
+                fincl2 = 255
+            end
+            if fincl2 <= 0 then
+                fincl2 = 0
+            end
+            if fincl3 >= 255 then
+                fincl3 = 255
+            end
+            if fincl3 <= 0 then
+                fincl3 = 0
+            end   
+            akcentlel = color.new(fincl1,fincl2,fincl3,pos_x_xd)     
+        end
+        addButonDiscord(widgetPos.y + 385, menuPos.x - widgetPos.x + 590)
+    end
+    if addTab("Misc", menuPos.x - 170 + tab_1 + tab_space + tab_2 + tab_space + tab_3 + tab_space, menuPos.y + 460, 4) then
+        addChild("General", menuPos.x + 20)
+        addCheckbox("Trash talk", widgetPos.y, 8, 0, 0)
+        addCheckbox("logs in consol", widgetPos.y + 20, 9, 0, 0)
+        addCheckbox("Clan tag", widgetPos.y + 40, 10, 0, 0)
+        addCheckbox("Force retreat", widgetPos.y + 60, 31, 0, 0)
+        addCheckbox("Fix zoom sensitivity", widgetPos.y + 80, 27, 0, 0)
+        addChild("Configs", menuPos.x + 385)
+        addButonSave(widgetPos.y)
+        addButonLoad(widgetPos.y + 30)
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 70, color.new(255, 255, 255),"Change logs:")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 83, color.new(255, 255, 255),"- improved resolver")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 96, color.new(255, 255, 255),"- added styles to keybinds list")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 109, color.new(255, 255, 255),"- added styles to watermark")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 122, color.new(255, 255, 255),"- added spectator list with styles")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 135, color.new(255, 255, 255),"- added knife on left hand")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 148, color.new(255, 255, 255),"- added viewmodel in scope")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 161, color.new(255, 255, 255),"- reamaked holo panel")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 174, color.new(255, 255, 255),"- added ideal scout")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 187, color.new(255, 255, 255),"- added in air and crouch in movements")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 200, color.new(255, 255, 255),"- added at target when")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 213, color.new(255, 255, 255),"- added external antibrute")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 226, color.new(255, 255, 255),"- added anims")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 226, color.new(255, 255, 255),"- added more presets")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 239, color.new(255, 255, 255),"- improved color picker")
+        render.draw_text(font, menuPos.x + 400,widgetPos.y + 252, color.new(255, 255, 255),"- miror fixes and more")
+        addButonDiscord(widgetPos.y + 385, menuPos.x - widgetPos.x + 590)
+    end
+
+    if asyncKeyState(0x1) and not dragingMenu and holdingWidget == 0 and holdingTab == 0 then
+        if mousePos.x >= menuPos.x and mousePos.x <= menuPos.x + 750 and mousePos.y >= menuPos.y + 45 and mousePos.y <= menuPos.y + 70 then
+            dragingMenu = true
+            menuDiff.x = mousePos.x - menuPos.x
+            menuDiff.y = mousePos.y - menuPos.y
+            if activeCombo ~= 0 then
+                activeCombo = 0
+            end
+        end
+    elseif not asyncKeyState(0x1) and dragingMenu then
+        dragingMenu = false
+    end
+end
+
+function is_knife(weap)
+    local lp = entitylist.get_local_player()
+    if not lp then return end
+    local idx = weap:get_prop_int("CBaseCombatWeapon", "m_iItemDefinitionIndex")
+    if not idx then return end
+    if idx == 42 or idx == 500 or idx == 515 or idx == 512 or idx == 505 or idx == 506 or idx == 507 or idx == 508 or idx == 516 or idx == 514 or idx == 59 or idx == 509 or idx == 41 or idx == 80 or idx == 520 or idx == 522 or idx == 519 or idx == 523 or idx == 503 or idx == 518 or idx == 517 or idx == 521 or idx == 525 then
+        return true
+    end
+    return false
+end
+
+client.add_callback("on_paint", function()
+    local lp = entitylist.get_local_player()
+    if not lp then return end
+    if entitylist.get_local_player():is_scoped() then
+        if boolVars[48] == true then
+            console.set_float( "fov_cs_debug", 90 )
+        end
+    end    
+    if boolVars[46] then
+        local weap = entitylist.get_weapon_by_player(entitylist.get_local_player())
+        if is_knife(weap) == true then
+            console.execute("cl_righthand 0")
+        else
+            console.execute("cl_righthand 1")
+        end
+    end
+end)
+        
+
+local backup = {
+    did = false,
+    yaw = 0,
+    pitch = 0,
+    target = 0
+}
+
+
+
+client.add_callback("create_move", function(cmd)
+    anti_aim(cmd)
+    anti_aim2(cmd)
+    fake_lag()
+    resolver(cmd)
+    slow_walk(cmd)
+end)
+
+client.add_callback("on_paint", function()
+    ragebot()
+    watermark()
+    clantag()
+    eventlog()
+    eventloggss()
+    drawMenu()
+end)
+
+
+
+local hitgroups = {
+    [0] = "generic",
+    [1] = "head",
+    [2] = "chest",
+    [3] = "stomach",
+    [4] = "left arm",
+    [5] = "right arm",
+    [6] = "left leg",
+    [7] = "right leg",
+    [10] = "gear",
+}
+
+local gpinf = engine.get_player_info
+
+events.register_event("bullet_impact", function(event)
+    local localplayer = entitylist.get_local_player()
+    if not localplayer then return end
+    local attacker = engine.get_player_for_user_id(event:get_int("userid"))
+    if attacker == localplayer:get_index() or entitylist.get_player_by_index(attacker):get_team() == localplayer:get_team() then return end
+    local id = 1
+    local speed = localplayer:get_velocity():length_2d()
+    if speed < 2 then
+        id = 1
+    elseif menu.get_key_bind_state("misc.slow_walk_key") then
+        id = 2
+    else
+        id = 3
+    end
+    local shoot_pos = vector.new(event:get_int("x"), event:get_int("y"), event:get_int("z"))
+    local origin = localplayer:get_origin()
+    if shoot_pos:length_2d() >= origin:length_2d() - 30 and shoot_pos:length_2d() <= origin:length_2d() + 30 then
+        should_change[id] = true
+    end
+end)
+
+client.add_callback("on_shot", function()
+    if boolVars[37] and menu.get_key_bind_state("anti_aim.invert_desync_key") then
+        menu.set_bool("anti_aim.invert_desync_key", false)
+    end
+    if boolVars[37] and not menu.get_key_bind_state("anti_aim.invert_desync_key") then
+        menu.set_bool("anti_aim.invert_desync_key", true)
+    end
+end) 
+
+events.register_event("player_hurt", function(event)
+    if boolVars[37] and menu.get_key_bind_state("anti_aim.invert_desync_key") then
+        menu.set_bool("anti_aim.invert_desync_key", false)
+    end
+    if boolVars[37] and not menu.get_key_bind_state("anti_aim.invert_desync_key") then
+        menu.set_bool("anti_aim.invert_desync_key", true)
+    end
+end)
+
+events.register_event("player_hurt", function(event)
+    if boolVars[9] then
+        local attacker = engine.get_player_for_user_id(event:get_int("attacker"))
+        local victim = engine.get_player_for_user_id(event:get_int("userid"))
+        local me = engine.get_local_player_index()
+        if victim == me and attacker ~= me and attacker ~= nil then
+            local dmg = event:get_int("dmg_health")
+            local hitgroup = event:get_int("hitgroup")
+            local hitbox = hitgroups[hitgroup]
+            local attacker_name = gpinf(attacker).name
+            coloredPrint(akcentlel, "[LegendSide] ")
+            coloredPrint(color.new(255, 255, 255), "Player " .. attacker_name .. " hurt you for " .. dmg .. " in " .. hitbox .. "\n")
+            table.insert(logs, {2, "Player " .. attacker_name .. " hurt you for " .. dmg .. " in " .. hitbox .. "", 0})
+        end
+    end
+end)
+
+events.register_event("player_death", function(event)
+    if boolVars[8] then
+        local attacker = engine.get_player_for_user_id(event:get_int("attacker"))
+        local dead = engine.get_player_for_user_id(event:get_int("userid"))
+        local me = engine.get_local_player_index()
+            
+        if attacker == me and dead ~= me then
+            text = {"Get good get Legendside",
+            "Legendside just the best",
+            "U can't kill me since i use Legendside!",
+            "Way too easy for legendside",
+            "Buy LegendSide or die"}
+            textid = math.random (1, 8)
+            console.execute ("say " .. text[textid])
+            end
+        end
+end)
+
+client.add_callback("on_shot", function(shot_info)
+    local results       = shot_info.result
+    local i             = shot_info.target_index
+    local targetname    = gpinf(i).name
+    local serverdamage  = shot_info.server_damage
+    local serverhitbox  = shot_info.server_hitbox
+    local clienthitbox  = shot_info.client_hitbox
+    local clientdamage  = shot_info.client_damage
+    local hitchance     = shot_info.hitchance
+  
+    ideal_tick_limit = 0
+    if results == "Hit" then
+        local reason = "[mismatched: no]"
+        if serverdamage < clientdamage then
+            reason = "[mismatched: in " .. clienthitbox .. " for " .. clientdamage - serverdamage .. "]"
+        end
+        if boolVars[17] then
+            coloredPrint(color.new(0, 152, 255), "[Legendside] ")
+            coloredPrint(color.new(255, 255, 255), "Hurt " .. targetname .. " for " .. serverdamage .. " in " .. serverhitbox .. " ")
+            coloredPrint(color.new(255, 255, 51), "" .. reason .. "\n")
+            table.insert(loggss, {1, "Hurt " .. targetname .. " for " .. serverdamage .. " in " .. serverhitbox .. " " .. reason .. "", 0})
+        end
+    end
+    if results == "Spread" then
+        if boolVars[17] then
+            coloredPrint(color.new(0, 152, 255), "[Legendside] ")
+            coloredPrint(color.new(255, 255, 255), "Missed " .. targetname .. " for " .. clientdamage .. " in " .. clienthitbox .. " ")
+            coloredPrint(color.new(255, 255, 51), "due to spread\n")
+            table.insert(loggss, {2, "Missed " .. targetname .. " for " .. clientdamage .. " in " .. clienthitbox .. " due to spread", 0})
+        end
+    end
+    if results == "Resolver" then
+        misses[i] = misses[i] + 1
+        if misses[i] > 2 then
+            misses[i] = 0
+        end
+        if boolVars[17] then
+            coloredPrint(color.new(0, 152, 255), "[Legendside] ")
+            coloredPrint(color.new(255, 255, 255), "Missed " .. targetname .. " for " .. clientdamage .. " in " .. clienthitbox .. " ")
+            coloredPrint(color.new(255, 0, 0), "due to resolver\n")
+            table.insert(loggss, {2, "Missed " .. targetname .. " for " .. clientdamage .. " in " .. clienthitbox .. " due to resolver", 0})
+        end
+    end
+end)
+
+loaded = true
